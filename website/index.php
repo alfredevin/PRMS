@@ -269,6 +269,166 @@ include './template/header.php';
                 </div>
                 <!-- ==================== FEATURES END ==================== -->
 
+                <!-- ==================== EVENTS SECTION ==================== -->
+                <div class="container-xxl py-5">
+                    <div class="container">
+                        <div class="text-center mx-auto mb-5" style="max-width: 600px;">
+                            <h6 class="section-title">Upcoming Events</h6>
+                            <h1 class="mb-3 fw-bold text-dark">Exciting Activities Awaiting You</h1>
+                            <p class="text-muted">Discover and participate in our exclusive events designed to make your stay unforgettable.</p>
+                        </div>
+
+                        <!-- Filter Buttons -->
+                        <div class="text-center mb-5">
+                            <button class="btn btn-sm btn-light border border-primary me-2 filter-btn active" data-filter="all">All Events</button>
+                            <button class="btn btn-sm btn-light border border-primary me-2 filter-btn" data-filter="upcoming">Upcoming</button>
+                            <button class="btn btn-sm btn-light border border-primary filter-btn" data-filter="past">Past Events</button>
+                        </div>
+
+                        <!-- Events Grid -->
+                        <div class="row g-4" id="eventsContainer">
+                            <?php
+                            $events_query = mysqli_query($conn, "SELECT * FROM event_tbl ORDER BY event_date ASC");
+                            $today = date('Y-m-d');
+                            while ($event = mysqli_fetch_assoc($events_query)) {
+                                $event_date = $event['event_date'];
+                                $is_upcoming = ($event_date >= $today) ? 'upcoming' : 'past';
+                                $event_datetime = strtotime($event_date . ' ' . $event['event_time']);
+                                $formatted_date = date("M d, Y", strtotime($event_date));
+                                $formatted_time = date("h:i A", $event_datetime);
+                                $days_away = ceil((strtotime($event_date) - strtotime($today)) / (60 * 60 * 24));
+                            ?>
+                                <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.1s" data-event-filter="<?php echo $is_upcoming; ?>">
+                                    <div class="event-card h-100 rounded-4 overflow-hidden shadow-lg" style="background: white; transition: all 0.3s ease; cursor: pointer; border: 2px solid #f0f0f0;">
+                                        <!-- Event Header with Icon -->
+                                        <div style="background: linear-gradient(135deg, #4e73df, #224abe); padding: 25px; color: white; text-align: center; position: relative;">
+                                            <div style="font-size: 2.5rem; margin-bottom: 10px;">
+                                                <i class="fas fa-calendar-alt"></i>
+                                            </div>
+                                            <h5 class="fw-bold mb-0" style="font-size: 1.1rem;"><?php echo substr($event['event_name'], 0, 30); ?></h5>
+                                            <?php if ($is_upcoming == 'upcoming' && $days_away <= 7 && $days_away >= 0) { ?>
+                                                <span class="badge bg-warning text-dark mt-2" style="position: absolute; top: 10px; right: 10px;">Coming Soon</span>
+                                            <?php } ?>
+                                        </div>
+
+                                        <!-- Event Body -->
+                                        <div style="padding: 25px;">
+                                            <!-- Description -->
+                                            <p class="text-muted small mb-4" style="line-height: 1.6; min-height: 50px;">
+                                                <?php echo substr($event['description'], 0, 100) . (strlen($event['description']) > 100 ? '...' : ''); ?>
+                                            </p>
+
+                                            <!-- Event Details -->
+                                            <div class="mb-4">
+                                                <div class="d-flex align-items-center mb-3" style="color: #555;">
+                                                    <i class="fas fa-calendar" style="color: #4e73df; margin-right: 10px; width: 20px; text-align: center;"></i>
+                                                    <span><?php echo $formatted_date; ?></span>
+                                                </div>
+                                                <div class="d-flex align-items-center mb-3" style="color: #555;">
+                                                    <i class="fas fa-clock" style="color: #4e73df; margin-right: 10px; width: 20px; text-align: center;"></i>
+                                                    <span><?php echo $formatted_time; ?></span>
+                                                </div>
+                                                <?php if ($days_away > 0 && $is_upcoming == 'upcoming') { ?>
+                                                    <div class="d-flex align-items-center" style="color: #28a745; font-weight: 600;">
+                                                        <i class="fas fa-hourglass-end" style="margin-right: 10px; width: 20px; text-align: center;"></i>
+                                                        <span><?php echo $days_away . ' day' . ($days_away != 1 ? 's' : '') . ' away'; ?></span>
+                                                    </div>
+                                                <?php } else if ($is_upcoming == 'past') { ?>
+                                                    <div class="d-flex align-items-center" style="color: #999;">
+                                                        <i class="fas fa-check-circle" style="margin-right: 10px; width: 20px; text-align: center;"></i>
+                                                        <span>Event Ended</span>
+                                                    </div>
+                                                <?php } ?>
+                                            </div>
+
+                                            <!-- Learn More Button -->
+                                            <a href="event.php" class="btn btn-sm btn-resort btn-resort-primary w-100" style="text-decoration: none;">
+                                                <i class="fas fa-arrow-right me-2"></i>View All Events
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            <?php } ?>
+                        </div>
+
+                        <!-- No Events Message -->
+                        <div class="text-center mt-5" id="noEventsMsg" style="display: none;">
+                            <p class="text-muted" style="font-size: 1.1rem;">
+                                <i class="fas fa-calendar-x" style="color: #ccc; font-size: 2rem;"></i><br>
+                                No events in this category.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Events Filter Script -->
+                <script>
+                    document.querySelectorAll('.filter-btn').forEach(btn => {
+                        btn.addEventListener('click', function() {
+                            const filter = this.dataset.filter;
+                            
+                            // Update active button
+                            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                            this.classList.add('active');
+                            
+                            // Filter events
+                            const events = document.querySelectorAll('[data-event-filter]');
+                            let visibleCount = 0;
+                            
+                            events.forEach(event => {
+                                if (filter === 'all' || event.dataset.eventFilter === filter) {
+                                    event.style.display = 'block';
+                                    visibleCount++;
+                                } else {
+                                    event.style.display = 'none';
+                                }
+                            });
+                            
+                            // Show/hide no events message
+                            document.getElementById('noEventsMsg').style.display = visibleCount === 0 ? 'block' : 'none';
+                        });
+                    });
+
+                    // Add hover effect to event cards
+                    document.querySelectorAll('.event-card').forEach(card => {
+                        card.addEventListener('mouseenter', function() {
+                            this.style.transform = 'translateY(-10px)';
+                            this.style.boxShadow = '0 20px 40px rgba(78, 115, 223, 0.2)';
+                            this.style.borderColor = '#4e73df';
+                        });
+                        card.addEventListener('mouseleave', function() {
+                            this.style.transform = 'translateY(0)';
+                            this.style.boxShadow = '0 15px 35px rgba(0, 0, 0, 0.1)';
+                            this.style.borderColor = '#f0f0f0';
+                        });
+                    });
+                </script>
+
+                <style>
+                    .filter-btn {
+                        transition: all 0.3s ease;
+                        font-weight: 600;
+                        color: #4e73df;
+                    }
+
+                    .filter-btn:hover {
+                        background-color: #f0f2f5 !important;
+                        border-color: #4e73df !important;
+                        color: #4e73df;
+                    }
+
+                    .filter-btn.active {
+                        background-color: #4e73df !important;
+                        color: white !important;
+                        border-color: #4e73df !important;
+                    }
+
+                    .event-card {
+                        border-left: 5px solid #4e73df;
+                    }
+                </style>
+                <!-- ==================== EVENTS END ==================== -->
+
                 <!-- ==================== ABOUT TEASER ==================== -->
                 <div class="container-fluid py-5 my-5" style="background: #f0f2f5;">
                     <div class="container">
