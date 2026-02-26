@@ -8,6 +8,7 @@ if (isset($_POST['add_event'])) {
     $desc = $_POST['description'];
     $date = $_POST['event_date'];
     $time = $_POST['event_time'];
+    $end_time = !empty($_POST['event_end_time']) ? $_POST['event_end_time'] : NULL;
 
     // Check for event name and date conflict
     $check_query = "SELECT * FROM event_tbl WHERE event_name = ? AND event_date = ?";
@@ -33,10 +34,10 @@ if (isset($_POST['add_event'])) {
             });
         </script>';
     } else {
-        $insert_query = "INSERT INTO event_tbl (event_name, description, event_date, event_time) 
-                             VALUES (?, ?, ?, ?)";
+        $insert_query = "INSERT INTO event_tbl (event_name, description, event_date, event_time, event_end_time) 
+                             VALUES (?, ?, ?, ?, ?)";
         $stmt = $conn->prepare($insert_query);
-        $stmt->bind_param("ssss", $name, $desc, $date, $time);
+        $stmt->bind_param("sssss", $name, $desc, $date, $time, $end_time);
         if ($stmt->execute()) {
             echo '<script>
                 document.addEventListener("DOMContentLoaded", function () {
@@ -79,6 +80,7 @@ if (isset($_POST['update_event'])) {
     $desc = $_POST['description'];
     $date = $_POST['event_date'];
     $time = $_POST['event_time'];
+    $end_time = !empty($_POST['event_end_time']) ? $_POST['event_end_time'] : NULL;
 
     // Check for duplicate name/date excluding the current event being edited
     $check_query = "SELECT * FROM event_tbl WHERE event_name = ? AND event_date = ? AND event_id != ?";
@@ -105,10 +107,10 @@ if (isset($_POST['update_event'])) {
         </script>';
     } else {
         $update_query = "UPDATE event_tbl 
-                         SET event_name = ?, description = ?, event_date = ?, event_time = ?
+                         SET event_name = ?, description = ?, event_date = ?, event_time = ?, event_end_time = ?
                          WHERE event_id = ?";
         $stmt = $conn->prepare($update_query);
-        $stmt->bind_param("ssssi", $name, $desc, $date, $time, $id);
+        $stmt->bind_param("sssssi", $name, $desc, $date, $time, $end_time, $id);
 
         if ($stmt->execute()) {
             echo '<script>
@@ -181,13 +183,17 @@ if (isset($_POST['update_event'])) {
                                         <div class="form-row">
                                             <div class="form-group mb-3 col-6">
                                                 <label for="event_date" class="font-weight-bold small">Date <span class="text-danger">*</span></label>
-                                                <!-- Client-side min date applied via JS below for better UX -->
                                                 <input type="date" class="form-control" id="event_date_input" name="event_date" min="<?= date('Y-m-d') ?>" required>
                                             </div>
                                             <div class="form-group mb-3 col-6">
-                                                <label for="event_time" class="font-weight-bold small">Time <span class="text-danger">*</span></label>
+                                                <label for="event_time" class="font-weight-bold small">Start Time <span class="text-danger">*</span></label>
                                                 <input type="time" class="form-control" name="event_time" required>
                                             </div>
+                                        </div>
+
+                                        <div class="form-group mb-3">
+                                            <label for="event_end_time" class="font-weight-bold small">End Time (Optional)</label>
+                                            <input type="time" class="form-control" name="event_end_time" placeholder="When does the event end?">
                                         </div>
 
                                         <div class="form-group mb-4">
@@ -217,7 +223,8 @@ if (isset($_POST['update_event'])) {
                                                     <th>Event Name</th>
                                                     <th>Description</th>
                                                     <th>Date</th>
-                                                    <th>Time</th>
+                                                    <th>Start Time</th>
+                                                    <th>End Time</th>
                                                     <th>Action</th>
                                                 </tr>
                                             </thead>
@@ -232,6 +239,7 @@ if (isset($_POST['update_event'])) {
                                                         <td><?= htmlspecialchars($res['description']) ?></td>
                                                         <td><?= date('M d, Y', strtotime($res['event_date'])) ?></td>
                                                         <td><?= date('h:i A', strtotime($res['event_time'])) ?></td>
+                                                        <td><?= !empty($res['event_end_time']) ? date('h:i A', strtotime($res['event_end_time'])) : '-' ?></td>
                                                         <td>
                                                             <button class="btn btn-warning btn-sm" data-toggle="modal" data-target="#edit<?= $res['event_id'] ?>">
                                                                 <i class="fas fa-edit"></i> Edit
@@ -261,9 +269,13 @@ if (isset($_POST['update_event'])) {
                                                                                 <input type="date" name="event_date" class="form-control" value="<?= $res['event_date'] ?>" min="<?= date('Y-m-d') ?>" required>
                                                                             </div>
                                                                             <div class="form-group col-6 mb-3">
-                                                                                <label class="font-weight-bold small">Time</label>
+                                                                                <label class="font-weight-bold small">Start Time</label>
                                                                                 <input type="time" name="event_time" class="form-control" value="<?= $res['event_time'] ?>" required>
                                                                             </div>
+                                                                        </div>
+                                                                        <div class="form-group mb-3">
+                                                                            <label class="font-weight-bold small">End Time (Optional)</label>
+                                                                            <input type="time" name="event_end_time" class="form-control" value="<?= $res['event_end_time'] ?? '' ?>">
                                                                         </div>
                                                                         <div class="form-group mb-3">
                                                                             <label class="font-weight-bold small">Description</label>

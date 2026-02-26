@@ -102,6 +102,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             $guest_stmt->close();
 
+            // Event Bookings
+            if (!empty($_POST['events']) && is_array($_POST['events'])) {
+                foreach ($_POST['events'] as $event_id) {
+                    $event_id = (int)$event_id;
+                    $number_of_guests = $guests;
+                    $event_sql = "INSERT INTO event_booking_tbl 
+                        (tracking_number, event_id, number_of_guests, status) 
+                        VALUES ('$tracking_number', '$event_id', '$number_of_guests', 'Pending')";
+                    mysqli_query($conn, $event_sql);
+                }
+            }
+
             // Services
             if (!empty($_POST['services']) && is_array($_POST['services'])) {
                 foreach ($_POST['services'] as $service_id) {

@@ -59,7 +59,14 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0;
         border-bottom: 3px solid #e9ecef;
         color: #aaa;
         font-weight: 500;
-        cursor: default;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+    }
+
+    .step:hover {
+        background-color: rgba(13, 110, 253, 0.05);
+        border-bottom-color: #0d6efd;
     }
 
     .step.active {
@@ -72,6 +79,12 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0;
         border-color: #198754;
         color: #198754;
     }
+
+    .step.completed::before {
+        content: "✓ ";
+        margin-right: 5px;
+    }
+
 
     .room-card-sticky {
         position: sticky;
@@ -219,11 +232,18 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0;
 
                         <div class="d-flex mb-5 pb-2 border-bottom overflow-auto" style="white-space: nowrap;">
                             <div class="step active">Step 1 <br><small>Info</small></div>
-                            <div class="step">Step 2 <br><small>Boat</small></div>
-                            <div class="step">Step 3 <br><small>Services</small></div>
-                            <div class="step">Step 4 <br><small>Rental</small></div>
-                            <div class="step">Step 5 <br><small>Payment</small></div>
-                            <div class="step">Step 6 <br><small>Confirm</small></div>
+                            <div class="step">Step 2 <br><small>Events</small></div>
+                            <div class="step">Step 3 <br><small>Boat</small></div>
+                            <div class="step">Step 4 <br><small>Services</small></div>
+                            <div class="step">Step 5 <br><small>Rental</small></div>
+                            <div class="step">Step 6 <br><small>Payment</small></div>
+                            <div class="step">Step 7 <br><small>Confirm</small></div>
+                        </div>
+
+                        <div class="alert alert-info alert-dismissible fade show mb-4" role="alert">
+                            <i class="bi bi-info-circle me-2"></i>
+                            <strong>Tip:</strong> You can click on any step above to navigate directly! ✓ marks completed steps.
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
 
                         <form id="multiStepForm" enctype="multipart/form-data" method="POST">
@@ -233,15 +253,27 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0;
                                 <h4 class="mb-4 text-primary fw-bold">Guest Information</h4>
 
                                 <div class="row g-3 mb-3">
-                                    <div class="col-md-6">
-                                        <label class="form-label fw-bold">Full Name</label>
-                                        <input type="text" class="form-control form-control-lg required" oninput="this.value = this.value.toUpperCase();" name="guest_name" placeholder="Juan Dela Cruz">
+                                    <div class="col-md-4">
+                                        <label class="form-label fw-bold">Last Name <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control form-control-lg required" required oninput="this.value = this.value.toUpperCase(); updateFullName();" name="guest_last_name" placeholder="Dela Cruz">
                                     </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label fw-bold">First Name <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control form-control-lg required" required oninput="this.value = this.value.toUpperCase(); updateFullName();" name="guest_first_name" placeholder="Juan">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label fw-bold">Middle Name</label>
+                                        <input type="text" class="form-control form-control-lg" oninput="this.value = this.value.toUpperCase(); updateFullName();" name="guest_middle_name" placeholder="Santos">
+                                    </div>
+                                    <input type="hidden" name="guest_name" id="guest_name_hidden">
+                                </div>
+
+                                <div class="row g-3 mb-3">
                                     <div class="col-md-6">
                                         <label class="form-label fw-bold">Contact Number</label>
                                         <input type="number" class="form-control form-control-lg required" oninput="this.value = this.value.slice(0, 11);" name="guest_phone" placeholder="09123456789">
                                     </div>
-                                    <div class="col-12">
+                                    <div class="col-md-6">
                                         <label class="form-label fw-bold">Email Address</label>
                                         <input type="email" class="form-control form-control-lg required" name="guest_email" placeholder="email@example.com">
                                     </div>
@@ -309,6 +341,48 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0;
                                             <input type="hidden" id="nights" name="totalNights">
                                         </div>
                                     </div>
+                                </div>
+                            </div>
+
+                            <div class="form-step d-none">
+                                <h4 class="mb-4 text-primary fw-bold">Resort Events</h4>
+                                <p class="text-muted mb-4">Select events you'd like to attend during your stay:</p>
+                                <div class="row g-3" id="eventsContainer">
+                                    <?php
+                                    $events_query = mysqli_query($conn, "SELECT * FROM event_tbl ORDER BY event_date ASC");
+                                    if (mysqli_num_rows($events_query) > 0) {
+                                        while ($event = mysqli_fetch_assoc($events_query)) {
+                                            $event_datetime = strtotime($event['event_date'] . ' ' . $event['event_time']);
+                                            $formatted_date = date("F d, Y", strtotime($event['event_date']));
+                                            $formatted_time = date("h:i A", $event_datetime);
+                                            $formatted_end = !empty($event['event_end_time']) ? date("h:i A", strtotime($event['event_date'] . ' ' . $event['event_end_time'])) : '';
+                                    ?>
+                                        <div class="col-md-6">
+                                            <div class="card event-option-card border-2 cursor-pointer" style="cursor: pointer; transition: all 0.3s; border-color: #e9ecef;">
+                                                <div class="card-body">
+                                                    <div class="form-check mb-0">
+                                                        <input class="form-check-input event-checkbox" type="checkbox" name="events[]" value="<?= $event['event_id'] ?>" id="event<?= $event['event_id'] ?>" data-event-name="<?= htmlspecialchars($event['event_name']) ?>" data-guests="1">
+                                                        <label class="form-check-label w-100" for="event<?= $event['event_id'] ?>" style="cursor: pointer;">
+                                                            <h6 class="fw-bold mb-2" style="color: #0d6efd;"><?= htmlspecialchars($event['event_name']) ?></h6>
+                                                            <small class="text-muted d-block">📅 <?= $formatted_date ?></small>
+                                                            <small class="text-muted d-block">🕐 <?= $formatted_time ?><?php if ($formatted_end) echo " - " . $formatted_end; ?></small>
+                                                            <small class="text-muted d-block mt-2"><?= htmlspecialchars(substr($event['description'], 0, 50)) ?>...</small>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    <?php
+                                        }
+                                    } else {
+                                        echo '<div class="col-12"><p class="text-muted text-center">No events available for your booking period</p></div>';
+                                    }
+                                    ?>
+                                </div>
+
+                                <div id="selectedEventsInfo" class="mt-4 d-none">
+                                    <h6 class="fw-bold mb-3">Your Selected Events:</h6>
+                                    <div id="selectedEventsList"></div>
                                 </div>
                             </div>
 
@@ -656,6 +730,12 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0;
         });
 
         // 3. STEP LOGIC & PAYMENT
+        // automatically clear invalid styles when user types
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.required').forEach(input => {
+                input.addEventListener('input', () => input.classList.remove('is-invalid'));
+            });
+        });
         const steps = document.querySelectorAll(".step");
         const formSteps = document.querySelectorAll(".form-step");
         const nextBtn = document.getElementById("nextBtn");
@@ -674,7 +754,10 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0;
             prevBtn.disabled = step === 0;
             nextBtn.textContent = step === formSteps.length - 1 ? "" : "Next";
 
-            if (step === 4) calculateSummary(); // Payment Step is index 4
+            if (step === 5) calculateSummary(); // Payment Step is now index 5 (after Events)
+            
+            // Scroll to top of form
+            document.querySelector('.card-body').scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
         function validateStep(step) {
@@ -692,8 +775,51 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0;
             return valid;
         }
 
+        // Make steps clickable
+        steps.forEach((step, index) => {
+            step.addEventListener("click", () => {
+                // Allow going backward without validation
+                if (index < currentStep) {
+                    currentStep = index;
+                    showStep(currentStep);
+                    return;
+                }
+                
+                // For going forward, validate current step first
+                if (index > currentStep) {
+                    // Validate all steps from current to target step
+                    for (let i = currentStep; i < index; i++) {
+                        if (!validateStep(i)) {
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Complete Current Step',
+                                text: 'Please fill in all required fields before moving to the next step',
+                                confirmButtonText: 'OK'
+                            });
+                            return;
+                        }
+                    }
+                    currentStep = index;
+                    showStep(currentStep);
+                } else if (index === currentStep) {
+                    // Already on this step
+                    return;
+                }
+            });
+        });
+
         nextBtn.addEventListener("click", () => {
-            if (!validateStep(currentStep)) return;
+            // update full name each time we advance so hidden value stays current
+            updateFullName();
+            if (!validateStep(currentStep)) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Complete This Step',
+                    text: 'Please fill in all required fields',
+                    confirmButtonText: 'OK'
+                });
+                return;
+            }
             if (currentStep < formSteps.length - 1) {
                 currentStep++;
                 showStep(currentStep);
@@ -778,12 +904,76 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0;
 
         document.getElementById("payment_option").addEventListener("change", calculateSummary);
 
+        // Event checkbox handling for visual feedback and summary
+        document.querySelectorAll('.event-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                const card = this.closest('.event-option-card');
+                if (this.checked) {
+                    card.style.borderColor = '#0d6efd';
+                    card.style.backgroundColor = '#f0f6ff';
+                } else {
+                    card.style.borderColor = '#e9ecef';
+                    card.style.backgroundColor = 'white';
+                }
+                updateSelectedEventsDisplay();
+            });
+
+            // Make the entire card clickable
+            const card = checkbox.closest('.event-option-card');
+            card.addEventListener('click', function(e) {
+                if (e.target !== checkbox) {
+                    checkbox.checked = !checkbox.checked;
+                    checkbox.dispatchEvent(new Event('change'));
+                }
+            });
+        });
+
+        function updateSelectedEventsDisplay() {
+            const selectedEvents = document.querySelectorAll('.event-checkbox:checked');
+            const selectedEventsList = document.getElementById('selectedEventsList');
+            const selectedEventsInfo = document.getElementById('selectedEventsInfo');
+
+            if (selectedEvents.length > 0) {
+                selectedEventsInfo.classList.remove('d-none');
+                selectedEventsList.innerHTML = '';
+                
+                selectedEvents.forEach(checkbox => {
+                    const eventName = checkbox.dataset.eventName;
+                    const eventId = checkbox.value;
+                    
+                    const eventItem = document.createElement('div');
+                    eventItem.className = 'alert alert-info alert-dismissible fade show mb-2';
+                    eventItem.innerHTML = `
+                        <strong>${eventName}</strong>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    `;
+                    selectedEventsList.appendChild(eventItem);
+                });
+            } else {
+                selectedEventsInfo.classList.add('d-none');
+            }
+        }
+
+        // Function to combine name inputs into hidden full name field
+        function updateFullName() {
+            const first = document.querySelector('input[name="guest_first_name"]').value.trim();
+            const middle = document.querySelector('input[name="guest_middle_name"]').value.trim();
+            const last = document.querySelector('input[name="guest_last_name"]').value.trim();
+            let full = '';
+            if (first) full += first;
+            if (middle) full += (full ? ' ' : '') + middle;
+            if (last) full += (full ? ' ' : '') + last;
+            document.getElementById('guest_name_hidden').value = full;
+        }
+
         // Confirm Button Logic
         const checkbox = document.getElementById("termsCheckbox");
         const confirmBtn = document.getElementById("confirmBookingBtn");
         checkbox.addEventListener('change', () => confirmBtn.disabled = !checkbox.checked);
 
         confirmBtn.addEventListener("click", function() {
+            // ensure full name hidden field is updated from split inputs
+            updateFullName();
             Swal.fire({
                 title: "Confirm Booking?",
                 text: "Do you want to confirm this reservation?",

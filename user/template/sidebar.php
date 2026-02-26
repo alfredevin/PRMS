@@ -14,7 +14,7 @@ $current_page = basename($_SERVER['PHP_SELF'], '.php');
 // Define grouped pages
 $reservation_page = ['newReservation', 'cancelledReservation', 'checkInCustomer', 'for_cancellation',    'forPaymentReservation', 'reservedCustomer', 'todayReservation', 'reserationHistory', 'view_reservation', 'checkInCustomer', 'reservationHistory'];
 $request_pages = ['pending_request', 'for_recieve', 'recieved'];
-$maintenance_pages = ['room_type', 'payment_type', 'add_room', 'event', 'entrance_fee', 'services', 'boat_rental_fee', 'rental', 'equipment', 'discount'];
+$maintenance_pages = ['room_type', 'payment_type', 'add_room', 'event', 'event_bookings', 'entrance_fee', 'services', 'boat_rental_fee', 'rental', 'equipment', 'discount'];
 $report_page = ['customerLogs', 'incomeReports', 'listOfReservationReport', 'servicesListReport', 'rentalListReport', 'roomListReport'];
 $inventory_page = ['equipment_inventory', 'borrowed_equipment', 'damaged_equipment', 'all_equipment_status'];
 ?>
@@ -233,6 +233,7 @@ $inventory_page = ['equipment_inventory', 'borrowed_equipment', 'damaged_equipme
                 <a class="collapse-item <?= $current_page == 'boat_rental_fee' ? 'active' : '' ?>" href="boat_rental_fee">Boat Fees</a>
                 <a class="collapse-item <?= $current_page == 'equipment' ? 'active' : '' ?>" href="equipment">Equipment</a>
                 <a class="collapse-item <?= $current_page == 'event' ? 'active' : '' ?>" href="event">Events</a>
+                <a class="collapse-item <?= $current_page == 'event_bookings' ? 'active' : '' ?>" href="event_bookings">Event Bookings</a>
                 <a class="collapse-item <?= $current_page == 'entrance_fee' ? 'active' : '' ?>" href="entrance_fee">Entrance Fees</a>
                 <a class="collapse-item <?= $current_page == 'discount' ? 'active' : '' ?>" href="discount">Promos / Discounts</a>
             </div>
