@@ -113,12 +113,15 @@ function formatCurrency($amount)
                     $checkOut = date("M d, Y", strtotime($res['check_out']));
                     $createdAt = date("M d, Y h:i A", strtotime($res['created_at']));
 
-                    // --- FETCH ALL CHARGES (Payments, Services, Rentals, Loans) ---
-                    
-                    // Get all payments made (sum)
-                    $payments_query = mysqli_query($conn, "SELECT SUM(amount) AS total_paid FROM reservation_payments_tbl WHERE tracking_number = '$tracking'");
-                    $total_paid = floatval(mysqli_fetch_assoc($payments_query)['total_paid'] ?? 0);
-
+// --- EVENT BOOKING (if any) ---
+$event_booking = null;
+$ev_q = mysqli_query($conn, "SELECT eb.*, et.event_name, et.event_date, et.event_time, et.event_end_time
+                             FROM event_booking_tbl eb
+                             JOIN event_tbl et ON eb.event_id = et.event_id
+                             WHERE eb.tracking_number = '$tracking' LIMIT 1");
+if (mysqli_num_rows($ev_q) > 0) {
+    $event_booking = mysqli_fetch_assoc($ev_q);
+}
                     // Get Loan Charges (from reservation_equipment_tbl)
                     $loan_charges_query = mysqli_query($conn, "
                         SELECT 
@@ -251,6 +254,32 @@ function formatCurrency($amount)
                                             </div>
                                         </div>
                                     </div>
+
+                                    <?php if ($event_booking): 
+                                            // determine badge color for event status
+                                            $evt_badge='badge-secondary';
+                                            if ($event_booking['status']=='Pending') $evt_badge='badge-warning';
+                                            elseif ($event_booking['status']=='Approved') $evt_badge='badge-success';
+                                            elseif ($event_booking['status']=='Rejected') $evt_badge='badge-danger';
+                                            elseif ($event_booking['status']=='Cancelled') $evt_badge='badge-dark';
+                                        ?>
+                                        <h6 class="section-title">Associated Event</h6>
+                                        <div class="mb-3">
+                                            <div class="info-label">Booking ID</div>
+                                            <div class="info-value">#<?= $event_booking['event_booking_id'] ?> <a href="event_bookings.php?filter=all#" target="_blank"><i class="fas fa-external-link-alt fa-sm"></i></a></div>
+                                            <div class="info-label">Event Name</div>
+                                            <div class="info-value"><?= htmlspecialchars($event_booking['event_name']) ?></div>
+                                            <div class="info-label">Date</div>
+                                            <div class="info-value"><?= date('M d, Y', strtotime($event_booking['event_date'])) ?></div>
+                                            <div class="info-label">Time</div>
+                                            <div class="info-value"><?= date('h:i A', strtotime($event_booking['event_time'])) ?><?php if (!empty($event_booking['event_end_time'])) echo ' - '.date('h:i A', strtotime($event_booking['event_end_time'])); ?></div>
+                                            <div class="info-label">Guests</div>
+                                            <div class="info-value"><span class="badge badge-info"><?= $event_booking['number_of_guests'] ?></span></div>
+                                            <div class="info-label">Status</div>
+                                            <div class="info-value"><span class="badge <?= $evt_badge ?>"><?= htmlspecialchars($event_booking['status']) ?></span></div>
+                                        </div>
+                                        <hr>
+                                    <?php endif; ?>
 
                                     <!-- Guest List Table -->
                                     <h6 class="section-title">Guest Breakdown (<?= $res['guests'] ?> Total)</h6>
