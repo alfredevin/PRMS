@@ -340,6 +340,7 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0;
                                                 </div>
                                                 <input type="hidden" name="adults" id="inputAdults" value="1">
                                                 <input type="hidden" name="children" id="inputChildren" value="0">
+                                                <input type="hidden" name="seniors" id="inputSeniors" value="0">
                                                 <input type="hidden" id="totalGuests" name="guests" value="1">
                                             </div>
                                         </div>
@@ -720,7 +721,7 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0;
             div.innerHTML = `
                 <div class="d-flex align-items-center justify-content-between">
                     <span class="small fw-bold">Adult ${index} Age</span>
-                    <select class="form-select form-select-sm w-50" name="adult_ages[]">
+                    <select class="form-select form-select-sm w-50 required" name="adult_ages[]" required>
                         <option value="" disabled selected>Select</option>
                         ${ageOptions}
                     </select>
@@ -746,7 +747,7 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0;
             div.innerHTML = `
                 <div class="d-flex align-items-center justify-content-between">
                     <span class="small fw-bold">Senior ${index} Age</span>
-                    <select class="form-select form-select-sm w-50" name="senior_ages[]">
+                    <select class="form-select form-select-sm w-50 required" name="senior_ages[]" required>
                         <option value="" disabled selected>Select</option>
                         ${ageOptions}
                     </select>
