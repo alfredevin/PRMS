@@ -457,6 +457,22 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0;
                                                 <div>
                                                     <h6 class="mb-0 fw-bold"><?= $service['service_name'] ?></h6>
                                                     <small class="text-muted">₱<?= number_format($service['service_price'], 2) ?></small>
+                                                    <?php if (!empty($service['service_description']) || !empty($service['service_inclusions'])): ?>
+                                                        <div class="service-details mt-2 d-none small text-muted">
+                                                            <?php if (!empty($service['service_description'])): ?>
+                                                                <div class="mb-1"><?= nl2br(htmlspecialchars($service['service_description'])) ?></div>
+                                                            <?php endif; ?>
+                                                            <?php if (!empty($service['service_inclusions'])): ?>
+                                                                <div class="fw-bold">Inclusions:</div>
+                                                                <ul class="mb-0">
+                                                                    <?php foreach (explode(',', $service['service_inclusions']) as $inc) {
+                                                                        echo '<li>' . htmlspecialchars(trim($inc)) . '</li>';
+                                                                    } ?>
+                                                                </ul>
+                                                            <?php endif; ?>
+                                                        </div>
+                                                        <a href="#" class="service-detail-toggle small">View details</a>
+                                                    <?php endif; ?>
                                                 </div>
                                             </div>
                                         </div>
@@ -473,6 +489,19 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0;
                                         <div class="col-md-6">
                                             <div class="card h-100 border rounded-3 p-3 d-flex flex-row align-items-center">
                                                 <div class="form-check me-3">
+                                                    <div class="rental-duration mt-2 d-none">
+                                                        <label class="small text-muted">Duration</label>
+                                                        <select class="form-select form-select-sm rental-duration-select" data-base-hours="<?= $rental['hours'] ?>" style="width:120px;">
+                                                            <?php
+                                                            $base = (int)$rental['hours'];
+                                                            $maxBlocks = 8; // allow up to 8 blocks (adjustable)
+                                                            for ($m = 1; $m <= $maxBlocks; $m++) {
+                                                                $hrs = $base * $m;
+                                                                echo "<option value=\"$m\">{$hrs} hrs ({$m}x)</option>";
+                                                            }
+                                                            ?>
+                                                        </select>
+                                                    </div>
                                                     <input class="form-check-input rental-check" type="checkbox" name="rentals[]" value="<?= $rental['rental_id'] ?>" data-price="<?= $rental['rental_price'] ?>">
                                                 </div>
                                                 <img src="./../user/admin/uploads/rentals/<?= $rental['rental_image'] ?>" style="width:60px; height:60px; object-fit:cover; border-radius:8px;" class="me-3">
@@ -960,7 +989,14 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0;
             document.querySelectorAll(".service-check:checked").forEach(cb => serviceTotal += parseFloat(cb.dataset.price));
 
             let rentalTotal = 0;
-            document.querySelectorAll(".rental-check:checked").forEach(cb => rentalTotal += parseFloat(cb.dataset.price));
+            document.querySelectorAll(".rental-check:checked").forEach(cb => {
+                let basePrice = parseFloat(cb.dataset.price);
+                let card = cb.closest('.card');
+                let sel = card ? card.querySelector('.rental-duration-select') : null;
+                let multiplier = 1;
+                if (sel) multiplier = parseInt(sel.value) || 1;
+                rentalTotal += basePrice * multiplier;
+            });
 
             let boatTotal = 0;
             document.querySelectorAll(".boat-check:checked").forEach(cb => {
@@ -1063,6 +1099,53 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0;
             });
         });
 
+        // Service details toggles
+        document.querySelectorAll('.service-detail-toggle').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const details = this.previousElementSibling;
+                if (!details) return;
+                details.classList.toggle('d-none');
+                this.textContent = details.classList.contains('d-none') ? 'View details' : 'Hide details';
+            });
+        });
+
+        // Rental selection: show duration select when rental is checked
+        document.querySelectorAll('.rental-check').forEach(cb => {
+            cb.addEventListener('change', function() {
+                const card = this.closest('.card');
+                const dur = card ? card.querySelector('.rental-duration') : null;
+                const sel = card ? card.querySelector('.rental-duration-select') : null;
+                if (this.checked) {
+                    if (dur) {
+                        dur.classList.remove('d-none');
+                        if (sel) sel.disabled = false;
+                    }
+                    // Optionally disable other rentals if you want single rental selection
+                } else {
+                    if (dur) {
+                        dur.classList.add('d-none');
+                        if (sel) {
+                            sel.disabled = true;
+                            sel.value = '1';
+                        }
+                    }
+                }
+                calculateSummary();
+            });
+        });
+
+        // Recalculate when rental duration changes
+        document.querySelectorAll('.rental-duration-select').forEach(s => {
+            s.addEventListener('change', calculateSummary);
+        });
+
+        // Initialize rental-duration selects as disabled/hidden
+        document.querySelectorAll('.rental-duration').forEach(div => {
+            const sel = div.querySelector('.rental-duration-select');
+            if (sel) sel.disabled = true;
+            div.classList.add('d-none');
+        });
         // island hop toggles affect total as well
         document.querySelectorAll('.include-island').forEach(ii => {
             ii.addEventListener('change', calculateSummary);
