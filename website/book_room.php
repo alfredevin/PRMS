@@ -344,11 +344,39 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0;
                                                 <div id="seniorAgesContainer" class="border-top pt-3 mt-2 d-none">
                                                     <small class="text-muted d-block mb-2 fw-bold">Senior Ages (optional)</small>
                                                 </div>
+                                                <div class="border-top pt-3 mt-2">
+                                                    <small class="text-muted d-block mb-2 fw-bold">Gender of Primary Guest:</small>
+                                                    <div class="d-flex gap-2">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="radio" name="gender" id="genderMale" value="Male" checked>
+                                                            <label class="form-check-label" for="genderMale">Male</label>
+                                                        </div>
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="radio" name="gender" id="genderFemale" value="Female">
+                                                            <label class="form-check-label" for="genderFemale">Female</label>
+                                                        </div>
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="radio" name="gender" id="genderOther" value="Other">
+                                                            <label class="form-check-label" for="genderOther">Other</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                                 <input type="hidden" name="adults" id="inputAdults" value="1">
                                                 <input type="hidden" name="children" id="inputChildren" value="0">
                                                 <input type="hidden" name="seniors" id="inputSeniors" value="0">
                                                 <input type="hidden" id="totalGuests" name="guests" value="1">
+                                                <input type="hidden" id="inputGender" name="inputGender" value="Male">
                                             </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Tourist Type</label>
+                                        <div class="btn-group w-100" role="group">
+                                            <input type="radio" class="btn-check" name="tourist_type" id="touristLocal" value="Local" checked>
+                                            <label class="btn btn-outline-primary w-50" for="touristLocal">Local</label>
+                                            <input type="radio" class="btn-check" name="tourist_type" id="touristForeign" value="Foreign">
+                                            <label class="btn btn-outline-primary w-50" for="touristForeign">Foreign</label>
                                         </div>
                                     </div>
                                 </div>
@@ -919,6 +947,12 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0;
             document.querySelectorAll('.include-island').forEach(ii => {
                 ii.disabled = true;
                 ii.checked = false;
+            });
+            // Add gender radio button listeners
+            document.querySelectorAll('input[name="gender"]').forEach(radio => {
+                radio.addEventListener('change', function() {
+                    document.getElementById('inputGender').value = this.value;
+                });
             });
         });
         const steps = document.querySelectorAll(".step");

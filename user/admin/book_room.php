@@ -298,11 +298,41 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0; // Default to 0 if walan
                                                             <div id="seniorAgesContainer" class="border-top pt-2 mt-2 d-none">
                                                                 <small class="text-muted d-block mb-2">Senior Ages (optional)</small>
                                                             </div>
+                                                            <div class="border-top pt-2 mt-2">
+                                                                <small class="text-muted d-block mb-2 font-weight-bold">Gender of Primary Guest:</small>
+                                                                <div class="d-flex gap-2">
+                                                                    <div class="custom-control custom-radio">
+                                                                        <input type="radio" id="genderMale" name="gender" value="Male" class="custom-control-input" checked>
+                                                                        <label class="custom-control-label" for="genderMale">Male</label>
+                                                                    </div>
+                                                                    <div class="custom-control custom-radio">
+                                                                        <input type="radio" id="genderFemale" name="gender" value="Female" class="custom-control-input">
+                                                                        <label class="custom-control-label" for="genderFemale">Female</label>
+                                                                    </div>
+                                                                    <div class="custom-control custom-radio">
+                                                                        <input type="radio" id="genderOther" name="gender" value="Other" class="custom-control-input">
+                                                                        <label class="custom-control-label" for="genderOther">Other</label>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
                                                             <input type="hidden" name="adults" id="inputAdults" value="1">
                                                             <input type="hidden" name="children" id="inputChildren" value="0">
                                                             <input type="hidden" name="seniors" id="inputSeniors" value="0">
                                                             <input type="hidden" id="totalGuests" name="guests" value="1">
+                                                            <input type="hidden" id="inputGender" name="inputGender" value="Male">
                                                         </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-group col-md-6">
+                                                    <label class="font-weight-bold small">Tourist Type</label>
+                                                    <div class="btn-group btn-group-toggle w-100" role="group" data-toggle="buttons">
+                                                        <label class="btn btn-outline-primary active w-50">
+                                                            <input type="radio" name="tourist_type" value="Local" checked> Local
+                                                        </label>
+                                                        <label class="btn btn-outline-primary w-50">
+                                                            <input type="radio" name="tourist_type" value="Foreign"> Foreign
+                                                        </label>
                                                     </div>
                                                 </div>
                                             </div>
@@ -575,6 +605,12 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0; // Default to 0 if walan
                 ii.disabled = true;
                 ii.checked = false;
                 ii.style.display = 'none';
+            });
+            // Add gender radio button listeners
+            document.querySelectorAll('input[name="gender"]').forEach(radio => {
+                radio.addEventListener('change', function() {
+                    document.getElementById('inputGender').value = this.value;
+                });
             });
         });
 
