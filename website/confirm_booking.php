@@ -75,15 +75,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             // --- UPDATED GUEST LOGIC ---
             $adult_count = isset($_POST['adults']) ? (int)$_POST['adults'] : 1;
-            $child_ages  = isset($_POST['child_ages']) ? $_POST['child_ages'] : []; 
+            $child_ages  = isset($_POST['child_ages']) ? $_POST['child_ages'] : [];
+            $adult_ages  = isset($_POST['adult_ages']) ? $_POST['adult_ages'] : [];
+            $senior_count = isset($_POST['seniors']) ? (int)$_POST['seniors'] : 0;
+            $senior_ages  = isset($_POST['senior_ages']) ? $_POST['senior_ages'] : [];
 
             $guest_stmt = $conn->prepare("INSERT INTO reservation_guests_tbl (reservation_id, age, category, pwd) VALUES (?, ?, ?, ?)");
 
             // 1. INSERT ADULTS
             for ($i = 0; $i < $adult_count; $i++) {
-                $age = 0;          
+                $age = isset($adult_ages[$i]) && is_numeric($adult_ages[$i]) ? (int)$adult_ages[$i] : 0;
                 $category = 'Adult';
-                $pwd = 'No';       
+                $pwd = 'No';
                 
                 $guest_stmt->bind_param("iiss", $reservation_id, $age, $category, $pwd);
                 $guest_stmt->execute();
@@ -100,6 +103,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $guest_stmt->execute();
                 }
             }
+
+            // 3. INSERT SENIORS
+            for ($i = 0; $i < $senior_count; $i++) {
+                $age = isset($senior_ages[$i]) && is_numeric($senior_ages[$i]) ? (int)$senior_ages[$i] : 0;
+                $category = 'Senior';
+                $pwd = 'No';
+
+                $guest_stmt->bind_param("iiss", $reservation_id, $age, $category, $pwd);
+                $guest_stmt->execute();
+            }
+
             $guest_stmt->close();
 
             // Event Bookings

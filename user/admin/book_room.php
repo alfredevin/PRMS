@@ -250,13 +250,13 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0; // Default to 0 if walan
                                                     <label class="font-weight-bold small">Guests</label>
                                                     <div class="dropdown">
                                                         <button class="btn btn-outline-secondary btn-block text-left d-flex justify-content-between align-items-center" type="button" id="guestDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                            <span id="guestSummary">1 Adult, 0 Children</span>
+                                                            <span id="guestSummary">1 Adult, 0 Children, 0 Seniors</span>
                                                             <i class="fas fa-chevron-down"></i>
                                                         </button>
                                                         <div class="dropdown-menu p-3 w-100 shadow" aria-labelledby="guestDropdown">
                                                             <div class="d-flex justify-content-between align-items-center mb-3">
                                                                 <div>
-                                                                    <h6 class="m-0 font-weight-bold">Adults</h6><small>Ages 13+</small>
+                                                                    <h6 class="m-0 font-weight-bold">Adults</h6><small>Ages 18-59</small>
                                                                 </div>
                                                                 <div>
                                                                     <button type="button" class="btn btn-sm btn-outline-primary rounded-circle" onclick="updateCount('adult', -1)">-</button>
@@ -266,7 +266,7 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0; // Default to 0 if walan
                                                             </div>
                                                             <div class="d-flex justify-content-between align-items-center mb-2">
                                                                 <div>
-                                                                    <h6 class="m-0 font-weight-bold">Children</h6><small>Ages 0-12</small>
+                                                                    <h6 class="m-0 font-weight-bold">Children</h6><small>Ages <18</small>
                                                                 </div>
                                                                 <div>
                                                                     <button type="button" class="btn btn-sm btn-outline-primary rounded-circle" onclick="updateCount('child', -1)">-</button>
@@ -274,11 +274,28 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0; // Default to 0 if walan
                                                                     <button type="button" class="btn btn-sm btn-outline-primary rounded-circle" onclick="updateCount('child', 1)">+</button>
                                                                 </div>
                                                             </div>
+                                                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                                                <div>
+                                                                    <h6 class="m-0 font-weight-bold">Seniors</h6><small>Ages 60+</small>
+                                                                </div>
+                                                                <div>
+                                                                    <button type="button" class="btn btn-sm btn-outline-primary rounded-circle" onclick="updateCount('senior', -1)">-</button>
+                                                                    <span class="mx-2 font-weight-bold" id="seniorCount">0</span>
+                                                                    <button type="button" class="btn btn-sm btn-outline-primary rounded-circle" onclick="updateCount('senior', 1)">+</button>
+                                                                </div>
+                                                            </div>
                                                             <div id="childAgesContainer" class="border-top pt-2 d-none">
                                                                 <small class="text-muted d-block mb-2">Child Ages:</small>
                                                             </div>
+                                                            <div id="adultAgesContainer" class="border-top pt-2 mt-2 d-none">
+                                                                <small class="text-muted d-block mb-2">Adult Ages (optional)</small>
+                                                            </div>
+                                                            <div id="seniorAgesContainer" class="border-top pt-2 mt-2 d-none">
+                                                                <small class="text-muted d-block mb-2">Senior Ages (optional)</small>
+                                                            </div>
                                                             <input type="hidden" name="adults" id="inputAdults" value="1">
                                                             <input type="hidden" name="children" id="inputChildren" value="0">
+                                                            <input type="hidden" name="seniors" id="inputSeniors" value="0">
                                                             <input type="hidden" id="totalGuests" name="guests" value="1">
                                                         </div>
                                                     </div>
@@ -377,7 +394,7 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0; // Default to 0 if walan
                                                 <div class="d-flex justify-content-between mb-1"><span>Room Fee</span> <span class="font-weight-bold text-dark" id="room_payment">₱0.00</span></div>
 
                                                 <div class="d-flex justify-content-between mb-1 text-primary">
-                                                    <span>Entrance Fee (<span id="adult_summary_count">1</span> Adults)</span>
+                                                    <span>Entrance Fee (<span id="guest_summary_count">1</span> Guests)</span>
                                                     <span class="font-weight-bold" id="entrance_payment">₱0.00</span>
                                                 </div>
                                                 <div class="d-flex justify-content-between mb-1"><span>Boat Fee</span> <span id="boat_rentals_payment">₱0.00</span></div>
@@ -469,38 +486,50 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0; // Default to 0 if walan
         // 1. GUEST LOGIC
         let adults = 1;
         let children = 0;
+        let seniors = 0;
         const maxGuests = <?= $room['max_guest'] ?>;
 
+        // initialize age selector containers on load
+        document.addEventListener('DOMContentLoaded', syncAgeSelectors);
+
         function updateCount(type, change) {
-            const total = adults + children;
+            const total = adults + children + seniors;
             if (type === 'adult') {
                 if (change === 1 && total < maxGuests) adults++;
                 if (change === -1 && adults > 1) adults--;
             } else if (type === 'child') {
                 if (change === 1 && total < maxGuests) {
                     children++;
-                    addChildAgeSelect(children);
                 }
                 if (change === -1 && children > 0) {
                     children--;
-                    removeChildAgeSelect();
                 }
+            } else if (type === 'senior') {
+                if (change === 1 && total < maxGuests) seniors++;
+                if (change === -1 && seniors > 0) seniors--;
             }
             document.getElementById('adultCount').innerText = adults;
             document.getElementById('childCount').innerText = children;
+            document.getElementById('seniorCount').innerText = seniors;
             document.getElementById('inputAdults').value = adults;
             document.getElementById('inputChildren').value = children;
-            document.getElementById('totalGuests').value = adults + children;
-            document.getElementById('guestSummary').innerText = `${adults} Adult${adults>1?'s':''}, ${children} Child${children>1?'ren':''}`;
+            document.getElementById('inputSeniors').value = seniors;
+            document.getElementById('totalGuests').value = adults + children + seniors;
+            let summaryText = `${adults} Adult${adults>1?'s':''}`;
+            if (children > 0) summaryText += `, ${children} Child${children>1?'ren':''}`;
+            if (seniors > 0) summaryText += `, ${seniors} Senior${seniors>1?'s':''}`;
+            document.getElementById('guestSummary').innerText = summaryText;
             const ac = document.getElementById('childAgesContainer');
             children > 0 ? ac.classList.remove('d-none') : ac.classList.add('d-none');
+
+            syncAgeSelectors();
         }
 
         function addChildAgeSelect(index) {
             const d = document.createElement('div');
             d.className = 'd-flex justify-content-between align-items-center mb-2 small';
             let ops = '';
-            for (let i = 0; i <= 12; i++) ops += `<option value="${i}">${i} yrs</option>`;
+            for (let i = 0; i <= 17; i++) ops += `<option value="${i}">${i} yrs</option>`;
             d.innerHTML = `<span>Child ${index} Age</span><select class="form-control form-control-sm w-50" name="child_ages[]">${ops}</select>`;
             document.getElementById('childAgesContainer').appendChild(d);
         }
@@ -508,6 +537,57 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0; // Default to 0 if walan
         function removeChildAgeSelect() {
             const c = document.getElementById('childAgesContainer');
             if (c.lastChild) c.removeChild(c.lastChild);
+        }
+
+        // Adult age helpers
+        function addAdultAgeSelect(index) {
+            const container = document.getElementById('adultAgesContainer');
+            const div = document.createElement('div');
+            div.className = 'mb-2 adult-age-input';
+            let ops = '';
+            for (let i = 18; i <= 59; i++) ops += `<option value="${i}">${i} yrs</option>`;
+            div.innerHTML = `<span>Adult ${index} Age</span><select class="form-control form-control-sm w-50" name="adult_ages[]"><option value="" disabled selected>Select</option>${ops}</select>`;
+            container.appendChild(div);
+        }
+
+        function removeAdultAgeSelect() {
+            const c = document.getElementById('adultAgesContainer');
+            if (c.lastChild) c.removeChild(c.lastChild);
+        }
+
+        // Senior age helpers
+        function addSeniorAgeSelect(index) {
+            const container = document.getElementById('seniorAgesContainer');
+            const div = document.createElement('div');
+            div.className = 'mb-2 senior-age-input';
+            let ops = '';
+            for (let i = 60; i <= 100; i++) ops += `<option value="${i}">${i} yrs</option>`;
+            div.innerHTML = `<span>Senior ${index} Age</span><select class="form-control form-control-sm w-50" name="senior_ages[]"><option value="" disabled selected>Select</option>${ops}</select>`;
+            container.appendChild(div);
+        }
+
+        function removeSeniorAgeSelect() {
+            const c = document.getElementById('seniorAgesContainer');
+            if (c.lastChild) c.removeChild(c.lastChild);
+        }
+
+        // maintain age selectors counts
+        function syncAgeSelectors() {
+            const aC = document.getElementById('adultAgesContainer');
+            const cC = document.getElementById('childAgesContainer');
+            const sC = document.getElementById('seniorAgesContainer');
+
+            while (aC.children.length < adults) addAdultAgeSelect(aC.children.length + 1);
+            while (aC.children.length > adults) removeAdultAgeSelect();
+            aC.classList.toggle('d-none', adults === 0);
+
+            while (cC.children.length < children) addChildAgeSelect(cC.children.length + 1);
+            while (cC.children.length > children) removeChildAgeSelect();
+            cC.classList.toggle('d-none', children === 0);
+
+            while (sC.children.length < seniors) addSeniorAgeSelect(sC.children.length + 1);
+            while (sC.children.length > seniors) removeSeniorAgeSelect();
+            sC.classList.toggle('d-none', seniors === 0);
         }
 
         // 2. COST LOGIC
@@ -610,12 +690,12 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0; // Default to 0 if walan
         function calculateSummary() {
             let room = parseFloat(document.getElementById("room_cost_value").value) || 0;
 
-            // CALCULATION NG ENTRANCE FEE (Adults lang)
-            // Note: ang variable na 'adults' ay global variable na nadeclare sa taas ng script mo
-            let totalEntrance = adults * entranceRate;
+            // CALCULATION NG ENTRANCE FEE (Everyone pays)
+            let totalGuestsCount = adults + children + seniors;
+            let totalEntrance = totalGuestsCount * entranceRate;
 
             // I-update ang Display ng Entrance Fee
-            document.getElementById("adult_summary_count").textContent = adults;
+            document.getElementById("guest_summary_count").textContent = totalGuestsCount;
             document.getElementById("entrance_payment").textContent = "₱" + totalEntrance.toLocaleString(undefined, {
                 minimumFractionDigits: 2
             });
