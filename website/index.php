@@ -341,15 +341,10 @@ include './template/header.php';
                                                 <?php } ?>
                                             </div>
 
-                                            <!-- Action Buttons -->
-                                            <div class="d-grid gap-2">
-                                                <a href="book_event.php?event_id=<?php echo $event['event_id']; ?>" class="btn btn-sm btn-resort btn-resort-primary" style="text-decoration: none;">
-                                                    <i class="fas fa-calendar-check me-2"></i>Book Event
-                                                </a>
-                                                <a href="event.php" class="btn btn-sm btn-outline-primary" style="text-decoration: none;">
-                                                    <i class="fas fa-arrow-right me-2"></i>View All Events
-                                                </a>
-                                            </div>
+                                            <!-- Learn More Button -->
+                                            <a href="event.php" class="btn btn-sm btn-resort btn-resort-primary w-100" style="text-decoration: none;">
+                                                <i class="fas fa-arrow-right me-2"></i>View All Events
+                                            </a>
                                         </div>
                                     </div>
                                 </div>

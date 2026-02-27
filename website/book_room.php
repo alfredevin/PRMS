@@ -137,6 +137,12 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0;
         color: #0d6efd;
         margin-right: 10px;
     }
+
+    /* Hide island hop checkbox until a boat is selected */
+    .include-island {
+        display: none;
+        margin-left: auto;
+    }
 </style>
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -837,6 +843,11 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0;
             document.querySelectorAll('.required').forEach(input => {
                 input.addEventListener('input', () => input.classList.remove('is-invalid'));
             });
+            // disable island hop checkboxes initially
+            document.querySelectorAll('.include-island').forEach(ii => {
+                ii.disabled = true;
+                ii.checked = false;
+            });
         });
         const steps = document.querySelectorAll(".step");
         const formSteps = document.querySelectorAll(".form-step");
@@ -959,6 +970,12 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0;
                 boatTotal += inc ? (p + island) : p;
             });
 
+            // Update visible total amount in Step 3 table
+            const totalAmountEl = document.getElementById('totalAmount');
+            if (totalAmountEl) {
+                totalAmountEl.innerText = boatTotal.toLocaleString(undefined, { minimumFractionDigits: 2 });
+            }
+
             // Displays
             document.getElementById("room_payment").value = "₱" + roomCost.toLocaleString(undefined, {
                 minimumFractionDigits: 2
@@ -1001,11 +1018,55 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0;
         }
 
         // Attach listeners for dynamic calculation
+        // General: recalc when any relevant checkbox/input changes
         document.querySelectorAll("input[type=checkbox]").forEach(cb => {
             cb.addEventListener('change', calculateSummary);
         });
 
         document.getElementById("payment_option").addEventListener("change", calculateSummary);
+
+        // Boat selection: allow only one selection at a time. When a boat is selected,
+        // disable other boat checkboxes and show the island-hop option only for the selected row.
+        document.querySelectorAll('.boat-check').forEach(cb => {
+            cb.addEventListener('change', function() {
+                if (this.checked) {
+                    // disable other boat choices
+                    document.querySelectorAll('.boat-check').forEach(o => {
+                        if (o !== this) o.disabled = true;
+                    });
+
+                    // show island hop only for this row
+                    const inc = this.closest('tr').querySelector('.include-island');
+                    if (inc) {
+                        inc.style.display = 'inline-block';
+                        inc.disabled = false;
+                    }
+
+                    // hide island hop for other rows
+                    document.querySelectorAll('.include-island').forEach(ii => {
+                        if (ii !== inc) {
+                            ii.style.display = 'none';
+                            ii.checked = false;
+                            ii.disabled = true;
+                        }
+                    });
+                } else {
+                    // unchecked -> allow user to change selection
+                    document.querySelectorAll('.boat-check').forEach(o => o.disabled = false);
+                    document.querySelectorAll('.include-island').forEach(ii => {
+                        ii.style.display = 'none';
+                        ii.checked = false;
+                        ii.disabled = true;
+                    });
+                }
+                calculateSummary();
+            });
+        });
+
+        // island hop toggles affect total as well
+        document.querySelectorAll('.include-island').forEach(ii => {
+            ii.addEventListener('change', calculateSummary);
+        });
 
         // Event checkbox handling for visual feedback and summary
         document.querySelectorAll('.event-checkbox').forEach(checkbox => {
