@@ -130,6 +130,11 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0; // Default to 0 if walan
     .flatpickr-calendar {
         z-index: 9999 !important;
     }
+    /* Hide island hop checkbox until a boat is selected */
+    .include-island {
+        display: none;
+        margin-left: auto;
+    }
 </style>
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
@@ -490,7 +495,15 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0; // Default to 0 if walan
         const maxGuests = <?= $room['max_guest'] ?>;
 
         // initialize age selector containers on load
-        document.addEventListener('DOMContentLoaded', syncAgeSelectors);
+        document.addEventListener('DOMContentLoaded', function() {
+            syncAgeSelectors();
+            // disable/hide island hop checkboxes initially
+            document.querySelectorAll('.include-island').forEach(ii => {
+                ii.disabled = true;
+                ii.checked = false;
+                ii.style.display = 'none';
+            });
+        });
 
         function updateCount(type, change) {
             const total = adults + children + seniors;
@@ -753,8 +766,47 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0; // Default to 0 if walan
         }
 
         // Listeners
+        // Generic recalculation when checkboxes change
         document.querySelectorAll("input[type=checkbox]").forEach(c => c.addEventListener('change', calculateSummary));
         document.getElementById("payment_option").addEventListener("change", calculateSummary);
+
+        // Boat selection: single-choice behavior and island-hop visibility
+        document.querySelectorAll('.boat-check').forEach(cb => {
+            cb.addEventListener('change', function() {
+                if (this.checked) {
+                    // disable other boats
+                    document.querySelectorAll('.boat-check').forEach(o => { if (o !== this) o.disabled = true; });
+
+                    // show island hop for this row
+                    const inc = this.closest('tr').querySelector('.include-island');
+                    if (inc) {
+                        inc.style.display = 'inline-block';
+                        inc.disabled = false;
+                    }
+
+                    // hide island hop for other rows
+                    document.querySelectorAll('.include-island').forEach(ii => {
+                        if (ii !== inc) {
+                            ii.style.display = 'none';
+                            ii.checked = false;
+                            ii.disabled = true;
+                        }
+                    });
+                } else {
+                    // allow selecting again
+                    document.querySelectorAll('.boat-check').forEach(o => o.disabled = false);
+                    document.querySelectorAll('.include-island').forEach(ii => {
+                        ii.style.display = 'none';
+                        ii.checked = false;
+                        ii.disabled = true;
+                    });
+                }
+                calculateSummary();
+            });
+        });
+
+        // island hop toggles affect totals
+        document.querySelectorAll('.include-island').forEach(ii => ii.addEventListener('change', calculateSummary));
 
         // Ensure initial calculation runs
         calculateRoomCost();
