@@ -518,6 +518,49 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0;
                             <div class="form-step d-none">
                                 <h4 class="mb-4 text-primary fw-bold">Payment Details</h4>
 
+                                <!-- Summary of All Selected Items -->
+                                <div class="card border-0 bg-white mb-4 shadow-sm">
+                                    <div class="card-header bg-light d-flex justify-content-between align-items-center" style="cursor: pointer;" data-bs-toggle="collapse" href="#summaryPanel">
+                                        <h6 class="mb-0 fw-bold">Booking Summary</h6>
+                                        <i class="bi bi-chevron-down"></i>
+                                    </div>
+                                    <div class="collapse show" id="summaryPanel">
+                                        <div class="card-body">
+                                            <!-- Events Summary -->
+                                            <div class="mb-3">
+                                                <h6 class="fw-bold text-primary mb-2">Events</h6>
+                                                <div id="summary_events" class="small text-muted ps-3">
+                                                    <p class="mb-0">No events selected</p>
+                                                </div>
+                                            </div>
+
+                                            <!-- Boat Summary -->
+                                            <div class="mb-3">
+                                                <h6 class="fw-bold text-primary mb-2">Boat Rental</h6>
+                                                <div id="summary_boat" class="small text-muted ps-3">
+                                                    <p class="mb-0">No boat selected</p>
+                                                </div>
+                                            </div>
+
+                                            <!-- Services Summary -->
+                                            <div class="mb-3">
+                                                <h6 class="fw-bold text-primary mb-2">Services</h6>
+                                                <div id="summary_services" class="small text-muted ps-3">
+                                                    <p class="mb-0">No services selected</p>
+                                                </div>
+                                            </div>
+
+                                            <!-- Rentals Summary -->
+                                            <div class="mb-3">
+                                                <h6 class="fw-bold text-primary mb-2">Equipment Rentals</h6>
+                                                <div id="summary_rentals" class="small text-muted ps-3">
+                                                    <p class="mb-0">No rentals selected</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <div class="bg-light p-4 rounded-4 mb-4 border">
                                     <div class="d-flex justify-content-between mb-2 text-muted"><span>Room Fee</span> <input class="border-0 bg-transparent text-end fw-bold text-dark" id="room_payment" readonly></div>
 
@@ -1005,6 +1048,84 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0;
                 let inc = cb.closest('tr').querySelector('.include-island').checked;
                 boatTotal += inc ? (p + island) : p;
             });
+
+            // UPDATE SUMMARY PANELS
+            // Events Summary
+            let selectedEvents = document.querySelectorAll('.event-checkbox:checked');
+            let eventsHtml = '';
+            if (selectedEvents.length > 0) {
+                eventsHtml = '<ul class="list-unstyled mb-0">';
+                selectedEvents.forEach(cb => {
+                    eventsHtml += `<li class="mb-1"><i class="bi bi-check-circle text-success me-1"></i>${cb.dataset.eventName}</li>`;
+                });
+                eventsHtml += '</ul>';
+            } else {
+                eventsHtml = '<p class="mb-0 text-muted">No events selected</p>';
+            }
+            document.getElementById('summary_events').innerHTML = eventsHtml;
+
+            // Boat Summary
+            let boatSummaryHtml = '';
+            let boatChecked = document.querySelector('.boat-check:checked');
+            if (boatChecked) {
+                let boatRow = boatChecked.closest('tr');
+                let dest = boatRow.cells[1].textContent.trim();
+                let price = parseFloat(boatChecked.dataset.boat);
+                let islandPrice = parseFloat(boatChecked.dataset.island);
+                let hasIsland = boatRow.querySelector('.include-island').checked;
+                let total = hasIsland ? price + islandPrice : price;
+                boatSummaryHtml = `
+                    <div class="mb-1"><strong>${dest}</strong></div>
+                    <div class="mb-1">Base: ₱${price.toLocaleString(undefined, { minimumFractionDigits: 2 })}`;
+                if (hasIsland) {
+                    boatSummaryHtml += `<br>Island Hopping: +₱${islandPrice.toLocaleString(undefined, { minimumFractionDigits: 2 })}`;
+                    boatSummaryHtml += `<br><span class="text-success fw-bold">Total: ₱${total.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>`;
+                } else {
+                    boatSummaryHtml += `<br><span class="text-success fw-bold">Total: ₱${total.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>`;
+                }
+                boatSummaryHtml += '</div>';
+            } else {
+                boatSummaryHtml = '<p class="mb-0 text-muted">No boat selected</p>';
+            }
+            document.getElementById('summary_boat').innerHTML = boatSummaryHtml;
+
+            // Services Summary
+            let selectedServices = document.querySelectorAll('.service-check:checked');
+            let servicesHtml = '';
+            if (selectedServices.length > 0) {
+                servicesHtml = '<ul class="list-unstyled mb-0">';
+                selectedServices.forEach(cb => {
+                    let name = cb.closest('.card').querySelector('h6').textContent.trim();
+                    let price = parseFloat(cb.dataset.price);
+                    servicesHtml += `<li class="mb-1"><i class="bi bi-check-circle text-success me-1"></i>${name} - ₱${price.toLocaleString(undefined, { minimumFractionDigits: 2 })}</li>`;
+                });
+                servicesHtml += '</ul>';
+            } else {
+                servicesHtml = '<p class="mb-0 text-muted">No services selected</p>';
+            }
+            document.getElementById('summary_services').innerHTML = servicesHtml;
+
+            // Rentals Summary
+            let selectedRentals = document.querySelectorAll('.rental-check:checked');
+            let rentalsHtml = '';
+            if (selectedRentals.length > 0) {
+                rentalsHtml = '<ul class="list-unstyled mb-0">';
+                selectedRentals.forEach(cb => {
+                    let card = cb.closest('.card');
+                    let name = card.querySelector('h6').textContent.trim();
+                    let basePrice = parseFloat(cb.dataset.price);
+                    let sel = card.querySelector('.rental-duration-select');
+                    let multiplier = sel ? (parseInt(sel.value) || 1) : 1;
+                    let baseHours = sel ? (parseInt(sel.dataset.baseHours) || 1) : 1;
+                    let totalHours = baseHours * multiplier;
+                    let itemTotal = basePrice * multiplier;
+                    rentalsHtml += `<li class="mb-2"><i class="bi bi-check-circle text-success me-1"></i><strong>${name}</strong><br><small>₱${basePrice.toLocaleString(undefined, { minimumFractionDigits: 2 })} per ${baseHours} hrs × ${multiplier} = ${totalHours} hrs = <span class="text-success fw-bold">₱${itemTotal.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span></small></li>`;
+                });
+                rentalsHtml += '</ul>';
+            } else {
+                rentalsHtml = '<p class="mb-0 text-muted">No rentals selected</p>';
+            }
+            document.getElementById('summary_rentals').innerHTML = rentalsHtml;
 
             // Update visible total amount in Step 3 table
             const totalAmountEl = document.getElementById('totalAmount');
