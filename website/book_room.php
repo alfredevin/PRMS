@@ -336,13 +336,13 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0;
                                                     </div>
                                                 </div>
                                                 <div id="childAgesContainer" class="border-top pt-3 mt-2 d-none">
-                                                    <small class="text-muted d-block mb-2 fw-bold">Child Ages:</small>
+                                                    <small class="text-muted d-block mb-2 fw-bold">Child Details:</small>
                                                 </div>
                                                 <div id="adultAgesContainer" class="border-top pt-3 mt-2 d-none">
-                                                    <small class="text-muted d-block mb-2 fw-bold">Adult Ages (optional)</small>
+                                                    <small class="text-muted d-block mb-2 fw-bold">Adult Details (optional)</small>
                                                 </div>
                                                 <div id="seniorAgesContainer" class="border-top pt-3 mt-2 d-none">
-                                                    <small class="text-muted d-block mb-2 fw-bold">Senior Ages (optional)</small>
+                                                    <small class="text-muted d-block mb-2 fw-bold">Senior Details (optional)</small>
                                                 </div>
                                                 <div class="border-top pt-3 mt-2">
                                                     <small class="text-muted d-block mb-2 fw-bold">Gender of Primary Guest:</small>
@@ -800,10 +800,15 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0;
 
             div.innerHTML = `
                 <div class="d-flex align-items-center justify-content-between gap-2">
-                    <span class="small fw-bold text-dark">Child ${index} Age</span>
-                    <select class="form-select form-select-sm w-auto" name="child_ages[]" required style="min-width: 150px;">
+                    <span class="small fw-bold text-dark">Child ${index}</span>
+                    <select class="form-select form-select-sm w-auto" name="child_ages[]" required style="min-width: 120px;">
                         <option value="" disabled selected>Select age</option>
                         ${ageOptions}
+                    </select>
+                    <select class="form-select form-select-sm w-auto" name="child_genders[]" required style="min-width: 120px;">
+                        <option value="" disabled selected>Select gender</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
                     </select>
                 </div>
             `;
@@ -826,10 +831,15 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0;
             }
             div.innerHTML = `
                 <div class="d-flex align-items-center justify-content-between gap-2">
-                    <span class="small fw-bold text-dark">Adult ${index} Age</span>
-                    <select class="form-select form-select-sm w-auto" name="adult_ages[]" style="min-width: 150px;">
+                    <span class="small fw-bold text-dark">Adult ${index}</span>
+                    <select class="form-select form-select-sm w-auto" name="adult_ages[]" style="min-width: 120px;">
                         <option value="" disabled selected>Select age</option>
                         ${ageOptions}
+                    </select>
+                    <select class="form-select form-select-sm w-auto" name="adult_genders[]" style="min-width: 120px;">
+                        <option value="" disabled selected>Select gender</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
                     </select>
                 </div>
             `;
@@ -852,10 +862,15 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0;
             }
             div.innerHTML = `
                 <div class="d-flex align-items-center justify-content-between gap-2">
-                    <span class="small fw-bold text-dark">Senior ${index} Age</span>
-                    <select class="form-select form-select-sm w-auto" name="senior_ages[]" style="min-width: 150px;">
+                    <span class="small fw-bold text-dark">Senior ${index}</span>
+                    <select class="form-select form-select-sm w-auto" name="senior_ages[]" style="min-width: 120px;">
                         <option value="" disabled selected>Select age</option>
                         ${ageOptions}
+                    </select>
+                    <select class="form-select form-select-sm w-auto" name="senior_genders[]" required style="min-width: 120px;">
+                        <option value="" disabled selected>Select gender</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
                     </select>
                 </div>
             `;
