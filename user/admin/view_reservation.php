@@ -114,7 +114,7 @@ function formatCurrency($amount)
                     $createdAt = date("M d, Y h:i A", strtotime($res['created_at']));
 
                     // --- FETCH ALL CHARGES (Payments, Services, Rentals, Loans) ---
-
+                    
                     // Get all payments made (sum)
                     $payments_query = mysqli_query($conn, "SELECT SUM(amount) AS total_paid FROM reservation_payments_tbl WHERE tracking_number = '$tracking'");
                     $total_paid = floatval(mysqli_fetch_assoc($payments_query)['total_paid'] ?? 0);
@@ -164,7 +164,8 @@ function formatCurrency($amount)
                     <div class="d-sm-flex align-items-center justify-content-between mb-4">
                         <h1 class="h3 mb-0 text-gray-800">Reservation Details</h1>
                         <div>
-                            <a href="<?= $_SERVER['HTTP_REFERER'] ?? 'reservation_list.php' ?>" class="btn btn-secondary btn-sm shadow-sm">
+                            <a href="<?= $_SERVER['HTTP_REFERER'] ?? 'reservation_list.php' ?>"
+                                class="btn btn-secondary btn-sm shadow-sm">
                                 <i class="fas fa-arrow-left fa-sm text-white-50"></i> Back
                             </a>
 
@@ -175,7 +176,8 @@ function formatCurrency($amount)
                             <?php endif; ?>
 
                             <?php if ($res['status'] == 4): ?>
-                                <a href="./report/print_reciept?tracking=<?= $tracking ?>" target="_blank" class="btn btn-primary btn-sm shadow-sm">
+                                <a href="./report/print_reciept?tracking=<?= $tracking ?>" target="_blank"
+                                    class="btn btn-primary btn-sm shadow-sm">
                                     <i class="fas fa-print fa-sm text-white-50"></i> Print Receipt
                                 </a>
                             <?php endif; ?>
@@ -190,12 +192,17 @@ function formatCurrency($amount)
                             <div class="card shadow mb-4 border-left-primary">
                                 <div class="card-body d-flex justify-content-between align-items-center">
                                     <div>
-                                        <span class="text-xs font-weight-bold text-primary text-uppercase mb-1">Reservation Status</span>
-                                        <div class="h5 mb-0 font-weight-bold text-gray-800"><?= getStatusBadge($res['status']) ?></div>
+                                        <span
+                                            class="text-xs font-weight-bold text-primary text-uppercase mb-1">Reservation
+                                            Status</span>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                            <?= getStatusBadge($res['status']) ?></div>
                                     </div>
                                     <div class="text-right">
-                                        <span class="text-xs font-weight-bold text-primary text-uppercase mb-1">Tracking Number</span>
-                                        <div class="h4 mb-0 font-weight-bold text-gray-800">#<?= $res['tracking_number'] ?></div>
+                                        <span class="text-xs font-weight-bold text-primary text-uppercase mb-1">Tracking
+                                            Number</span>
+                                        <div class="h4 mb-0 font-weight-bold text-gray-800">
+                                            #<?= $res['tracking_number'] ?></div>
                                     </div>
                                 </div>
                             </div>
@@ -203,12 +210,15 @@ function formatCurrency($amount)
                             <!-- Guest & Room Details -->
                             <div class="card shadow mb-4">
                                 <div class="card-header py-3">
-                                    <h6 class="m-0 font-weight-bold text-primary"><i class="fas fa-user-tag me-2"></i>Guest & Room Info</h6>
+                                    <h6 class="m-0 font-weight-bold text-primary"><i
+                                            class="fas fa-user-tag me-2"></i>Guest & Room Info</h6>
                                 </div>
                                 <div class="card-body">
                                     <div class="row mb-4">
                                         <div class="col-md-4 text-center">
-                                            <img src="<?= $res['room_image'] ?>" class="img-fluid rounded shadow-sm mb-2" style="max-height: 150px; width: 100%; object-fit: cover;">
+                                            <img src="<?= $res['room_image'] ?>"
+                                                class="img-fluid rounded shadow-sm mb-2"
+                                                style="max-height: 150px; width: 100%; object-fit: cover;">
                                             <p class="font-weight-bold text-primary mb-0"><?= $res['room_name'] ?></p>
                                             <small class="text-muted"><?= $res['room_type_name'] ?></small>
                                         </div>
@@ -228,18 +238,22 @@ function formatCurrency($amount)
                                                 </div>
                                                 <div class="col-md-6 mb-3">
                                                     <div class="info-label">Check-In</div>
-                                                    <div class="info-value text-success"><i class="fas fa-calendar-check me-1"></i> <?= $checkIn ?></div>
+                                                    <div class="info-value text-success"><i
+                                                            class="fas fa-calendar-check me-1"></i> <?= $checkIn ?>
+                                                    </div>
                                                 </div>
                                                 <div class="col-md-6 mb-3">
                                                     <div class="info-label">Check-Out</div>
-                                                    <div class="info-value text-danger"><i class="fas fa-calendar-times me-1"></i> <?= $checkOut ?></div>
+                                                    <div class="info-value text-danger"><i
+                                                            class="fas fa-calendar-times me-1"></i> <?= $checkOut ?>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
 
                                     <!-- Guest List Table -->
-                                    <h6 class="section-title">Children/Extra Guest List (<?= $res['guests'] ?> Total)</h6>
+                                    <h6 class="section-title">Guest Breakdown (<?= $res['guests'] ?> Total)</h6>
                                     <div class="table-responsive mb-3">
                                         <?php
                                         $sql_guests = "SELECT * FROM reservation_guests_tbl WHERE reservation_id = '$reservation_id'";
@@ -247,18 +261,40 @@ function formatCurrency($amount)
 
                                         if (mysqli_num_rows($res_guests) > 0) {
                                             echo "<table class='table table-bordered table-sm text-center'>";
-                                            echo "<thead class='bg-light text-primary'><tr><th>#</th><th>Age</th><th>Category</th> </tr></thead><tbody>";
+                                            echo "<thead class='bg-light text-primary'>
+                <tr>
+                    <th>#</th>
+                    <th>Category</th>
+                    <th>Age</th>
+                    <th>Gender</th>
+                </tr>
+              </thead>
+              <tbody>";
                                             $i = 1;
                                             while ($g = mysqli_fetch_assoc($res_guests)) {
                                                 $category = empty($g['category']) ? 'Adult' : htmlspecialchars($g['category']);
-                                                // FIX: Define variable outside string interpolation to avoid syntax error
                                                 $age_val = isset($g['age']) ? $g['age'] : 'N/A';
-                                                echo "<tr><td>{$i}</td><td>{$age_val}</td><td><span class='badge badge-info'>{$category}</span></td> </tr>";
+                                                $gender = $g['gender'] ?? 'N/A';
+
+                                                // Set gender badge color
+                                                $gender_class = ($gender == 'Male') ? 'badge-primary' : (($gender == 'Female') ? 'badge-danger' : 'badge-secondary');
+                                                $gender_icon = ($gender == 'Male') ? 'fa-mars' : (($gender == 'Female') ? 'fa-venus' : 'fa-genderless');
+
+                                                echo "<tr>
+                    <td>{$i}</td>
+                    <td><span class='badge badge-info'>{$category}</span></td>
+                    <td>{$age_val} yrs old</td>
+                    <td>
+                        <span class='badge {$gender_class}'>
+                            <i class='fas {$gender_icon} me-1'></i> {$gender}
+                        </span>
+                    </td>
+                  </tr>";
                                                 $i++;
                                             }
                                             echo "</tbody></table>";
                                         } else {
-                                            echo "<div class='alert alert-light border text-center text-muted'><small>Guest breakdown not available.</small></div>";
+                                            echo "<div class='alert alert-light border text-center text-muted'><small>No individual guest breakdown found.</small></div>";
                                         }
                                         ?>
                                     </div>
@@ -270,7 +306,8 @@ function formatCurrency($amount)
                                 <div class="col-md-6">
                                     <div class="card shadow mb-4">
                                         <div class="card-header py-3 bg-info text-white">
-                                            <h6 class="m-0 font-weight-bold"><i class="fas fa-concierge-bell me-1"></i> Services & Rentals</h6>
+                                            <h6 class="m-0 font-weight-bold"><i class="fas fa-concierge-bell me-1"></i>
+                                                Services & Rentals</h6>
                                         </div>
                                         <div class="card-body">
                                             <?php
@@ -310,7 +347,8 @@ function formatCurrency($amount)
                                 <div class="col-md-6">
                                     <div class="card shadow mb-4">
                                         <div class="card-header py-3 bg-primary text-white">
-                                            <h6 class="m-0 font-weight-bold"><i class="fas fa-tools me-1"></i> Equipment Loan History</h6>
+                                            <h6 class="m-0 font-weight-bold"><i class="fas fa-tools me-1"></i> Equipment
+                                                Loan History</h6>
                                         </div>
                                         <div class="card-body">
                                             <?php if (!empty($loan_charges)): ?>
@@ -328,9 +366,11 @@ function formatCurrency($amount)
                                                             <tr>
                                                                 <td><?= htmlspecialchars($loan['equipment_name']) ?></td>
                                                                 <td class="text-center"><?= $loan['quantity_loaned'] ?></td>
-                                                                <td class="text-center text-danger"><?= formatCurrency($loan['loan_total']) ?></td>
+                                                                <td class="text-center text-danger">
+                                                                    <?= formatCurrency($loan['loan_total']) ?></td>
                                                                 <td class="text-center">
-                                                                    <span class="badge badge-<?= $loan['loan_status'] == 'ACTIVE' ? 'warning' : 'success' ?>">
+                                                                    <span
+                                                                        class="badge badge-<?= $loan['loan_status'] == 'ACTIVE' ? 'warning' : 'success' ?>">
                                                                         <?= strtoupper($loan['loan_status']) ?>
                                                                     </span>
                                                                 </td>
@@ -353,27 +393,32 @@ function formatCurrency($amount)
                             <!-- Payment Summary Card -->
                             <div class="card shadow mb-4">
                                 <div class="card-header py-3">
-                                    <h6 class="m-0 font-weight-bold text-primary"><i class="fas fa-calculator me-2"></i>Financial Breakdown</h6>
+                                    <h6 class="m-0 font-weight-bold text-primary"><i
+                                            class="fas fa-calculator me-2"></i>Financial Breakdown</h6>
                                 </div>
                                 <div class="card-body">
                                     <div class="d-flex justify-content-between mb-2">
                                         <span class="info-label">Initial Booking Cost</span>
-                                        <span class="info-value text-gray-800"><?= formatCurrency($res['total_price']) ?></span>
+                                        <span
+                                            class="info-value text-gray-800"><?= formatCurrency($res['total_price']) ?></span>
                                     </div>
                                     <div class="d-flex justify-content-between mb-2">
                                         <span class="info-label">Total Equipment Loans</span>
-                                        <span class="info-value text-danger">+ <?= formatCurrency($total_loan_charge) ?></span>
+                                        <span class="info-value text-danger">+
+                                            <?= formatCurrency($total_loan_charge) ?></span>
                                     </div>
                                     <hr class>
                                     <div class="d-flex justify-content-between mb-3">
                                         <span class="info-label font-weight-bold">GRAND TOTAL DUE</span>
-                                        <span class="h5 font-weight-bold text-primary">₱<?= number_format($final_total_due, 2) ?></span>
+                                        <span
+                                            class="h5 font-weight-bold text-primary">₱<?= number_format($final_total_due, 2) ?></span>
                                     </div>
 
                                     <?php if ($res['status'] == 4): ?>
                                         <!-- Layout for Completed/Checked Out -->
                                         <div class="alert alert-success text-center">
-                                            <h4 class="alert-heading font-weight-bold"><i class="fas fa-check-double"></i> FULLY PAID</h4>
+                                            <h4 class="alert-heading font-weight-bold"><i class="fas fa-check-double"></i>
+                                                FULLY PAID</h4>
                                             <p class="mb-0">Transaction Completed</p>
                                             <hr>
                                             <div class="d-flex justify-content-between">
@@ -389,7 +434,8 @@ function formatCurrency($amount)
                                         <!-- Layout for Active/Pending -->
                                         <div class="d-flex justify-content-between mb-3">
                                             <span class="info-label">Total Paid So Far</span>
-                                            <span class="h5 font-weight-bold text-success">- ₱<?= number_format($total_paid, 2) ?></span>
+                                            <span class="h5 font-weight-bold text-success">-
+                                                ₱<?= number_format($total_paid, 2) ?></span>
                                         </div>
 
                                         <div class="alert <?= ($final_balance > 0) ? 'alert-danger' : 'alert-success' ?>">
@@ -410,7 +456,8 @@ function formatCurrency($amount)
                             <!-- Payment Proof Card -->
                             <div class="card shadow mb-4">
                                 <div class="card-header py-3">
-                                    <h6 class="m-0 font-weight-bold text-primary"><i class="fas fa-receipt me-2"></i>Payment Details</h6>
+                                    <h6 class="m-0 font-weight-bold text-primary"><i
+                                            class="fas fa-receipt me-2"></i>Payment Details</h6>
                                 </div>
                                 <div class="card-body">
                                     <!-- <div class="mb-2">
@@ -421,21 +468,21 @@ function formatCurrency($amount)
                                     </div> -->
                                     <div class="mb-2">
                                         <span class="info-label">Method:</span>
-                                        <span class="float-right font-weight-bold"><?= $initial_payment_detail['payment_type_name'] ?? 'N/A' ?></span>
+                                        <span
+                                            class="float-right font-weight-bold"><?= $initial_payment_detail['payment_type_name'] ?? 'N/A' ?></span>
                                     </div>
                                     <div class="mb-2">
                                         <span class="info-label">Reference / Note:</span>
-                                        <span class="float-right font-weight-bold"><?= $initial_payment_detail['reference_number'] ?? 'N/A' ?></span>
+                                        <span
+                                            class="float-right font-weight-bold"><?= $initial_payment_detail['reference_number'] ?? 'N/A' ?></span>
                                     </div>
 
                                     <h6 class="section-title mt-3">Proof of Payment</h6>
                                     <div class="text-center">
                                         <?php if (!empty($initial_payment_detail['proof_image'])): ?>
                                             <img src="./../../website/uploads/<?= $initial_payment_detail['proof_image'] ?>"
-                                                class="img-fluid rounded shadow-sm proof-img"
-                                                style="max-height: 200px;"
-                                                alt="Proof of Payment"
-                                                data-toggle="modal" data-target="#proofModal">
+                                                class="img-fluid rounded shadow-sm proof-img" style="max-height: 200px;"
+                                                alt="Proof of Payment" data-toggle="modal" data-target="#proofModal">
                                             <p class="small text-muted mt-2">Click image to enlarge</p>
                                         <?php else: ?>
                                             <div class="alert alert-secondary">No proof uploaded</div>
@@ -465,7 +512,8 @@ function formatCurrency($amount)
                 </div>
                 <div class="modal-body text-center bg-dark">
                     <?php if (!empty($initial_payment_detail['proof_image'])): ?>
-                        <img src="./../../website/uploads/<?= $initial_payment_detail['proof_image'] ?>" class="img-fluid" style="max-height: 80vh;">
+                        <img src="./../../website/uploads/<?= $initial_payment_detail['proof_image'] ?>" class="img-fluid"
+                            style="max-height: 80vh;">
                     <?php endif; ?>
                 </div>
             </div>
@@ -484,7 +532,7 @@ function formatCurrency($amount)
         // Since this page handles the details view, the action button will dynamically appear based on the status.
 
         <?php if ($res['status'] == 1): ?>
-            $(document).on('click', '#confirmBtn', function() {
+            $(document).on('click', '#confirmBtn', function () {
                 Swal.fire({
                     title: 'Confirm Reservation?',
                     text: "This will update the status to confirmed   and notify the guest.",
@@ -511,7 +559,7 @@ function formatCurrency($amount)
                                 reservation_id: <?= $res['reservation_id'] ?>,
                                 status: 2 // Status 2 = Confirmed
                             },
-                            success: function(response) {
+                            success: function (response) {
                                 Swal.fire({
                                     icon: 'success',
                                     title: 'Confirmed!',
@@ -520,7 +568,7 @@ function formatCurrency($amount)
                                     location.reload();
                                 });
                             },
-                            error: function() {
+                            error: function () {
                                 Swal.fire({
                                     icon: 'error',
                                     title: 'Error',

@@ -156,7 +156,8 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0;
     <div class="container mt-5 mb-5">
 
         <div class="d-lg-none mb-4">
-            <div class="card shadow-sm border-0 bg-primary text-white rounded-4" data-bs-toggle="collapse" href="#mobileRoomInfo" role="button">
+            <div class="card shadow-sm border-0 bg-primary text-white rounded-4" data-bs-toggle="collapse"
+                href="#mobileRoomInfo" role="button">
                 <div class="card-body d-flex justify-content-between align-items-center">
                     <div>
                         <h6 class="mb-0 fw-bold"><i class="bi bi-info-circle me-2"></i> Booking Summary</h6>
@@ -170,7 +171,8 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0;
             </div>
             <div class="collapse mt-2" id="mobileRoomInfo">
                 <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
-                    <img src="./../user/admin/<?= htmlspecialchars($room['image']) ?>" class="img-fluid" style="max-height: 200px; object-fit: cover;">
+                    <img src="./../user/admin/<?= htmlspecialchars($room['image']) ?>" class="img-fluid"
+                        style="max-height: 200px; object-fit: cover;">
                     <div class="card-body bg-light">
                         <p class="small text-muted mb-0"><?= htmlspecialchars($room['room_description']) ?></p>
                     </div>
@@ -194,18 +196,23 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0;
 
                     <div class="card-body p-4">
                         <h3 class="text-primary fw-bold mb-1"><?= htmlspecialchars($room['room_name']) ?></h3>
-                        <h6 class="text-uppercase text-muted fw-bold mb-3"><?= htmlspecialchars($room['room_type_name']) ?></h6>
+                        <h6 class="text-uppercase text-muted fw-bold mb-3">
+                            <?= htmlspecialchars($room['room_type_name']) ?></h6>
 
                         <div class="mb-4 p-3 bg-light rounded-3">
                             <?php if ($active_discount > 0): ?>
                                 <div class="d-flex align-items-center justify-content-between">
-                                    <span class="text-muted text-decoration-line-through">₱<?= number_format($orig_price, 2) ?></span>
+                                    <span
+                                        class="text-muted text-decoration-line-through">₱<?= number_format($orig_price, 2) ?></span>
                                     <span class="badge bg-danger">Save <?= $active_discount ?>%</span>
                                 </div>
-                                <div class="fs-2 fw-bold text-success">₱<?= number_format($final_price, 2) ?> <small class="fs-6 text-muted text-dark">/ night</small></div>
-                                <small class="text-danger fw-bold"><i class="fas fa-fire me-1"></i> <?= htmlspecialchars($promo_name) ?> Applied!</small>
+                                <div class="fs-2 fw-bold text-success">₱<?= number_format($final_price, 2) ?> <small
+                                        class="fs-6 text-muted text-dark">/ night</small></div>
+                                <small class="text-danger fw-bold"><i class="fas fa-fire me-1"></i>
+                                    <?= htmlspecialchars($promo_name) ?> Applied!</small>
                             <?php else: ?>
-                                <div class="fs-2 fw-bold text-dark">₱<?= number_format($orig_price, 2) ?> <small class="fs-6 text-muted">/ night</small></div>
+                                <div class="fs-2 fw-bold text-dark">₱<?= number_format($orig_price, 2) ?> <small
+                                        class="fs-6 text-muted">/ night</small></div>
                             <?php endif; ?>
                         </div>
 
@@ -248,7 +255,8 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0;
 
                         <div class="alert alert-info alert-dismissible fade show mb-4" role="alert">
                             <i class="bi bi-info-circle me-2"></i>
-                            <strong>Tip:</strong> You can click on any step above to navigate directly! ✓ marks completed steps.
+                            <strong>Tip:</strong> You can click on any step above to navigate directly! ✓ marks
+                            completed steps.
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
 
@@ -260,16 +268,24 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0;
 
                                 <div class="row g-3 mb-3">
                                     <div class="col-md-4">
-                                        <label class="form-label fw-bold">Last Name <span class="text-danger">*</span></label>
-                                        <input type="text" class="form-control form-control-lg required" required oninput="this.value = this.value.toUpperCase(); updateFullName();" name="guest_last_name" placeholder="Dela Cruz">
+                                        <label class="form-label fw-bold">Last Name <span
+                                                class="text-danger">*</span></label>
+                                        <input type="text" class="form-control form-control-lg required" required
+                                            oninput="this.value = this.value.toUpperCase(); updateFullName();"
+                                            name="guest_last_name" placeholder="Dela Cruz">
                                     </div>
                                     <div class="col-md-4">
-                                        <label class="form-label fw-bold">First Name <span class="text-danger">*</span></label>
-                                        <input type="text" class="form-control form-control-lg required" required oninput="this.value = this.value.toUpperCase(); updateFullName();" name="guest_first_name" placeholder="Juan">
+                                        <label class="form-label fw-bold">First Name <span
+                                                class="text-danger">*</span></label>
+                                        <input type="text" class="form-control form-control-lg required" required
+                                            oninput="this.value = this.value.toUpperCase(); updateFullName();"
+                                            name="guest_first_name" placeholder="Juan">
                                     </div>
                                     <div class="col-md-4">
                                         <label class="form-label fw-bold">Middle Name</label>
-                                        <input type="text" class="form-control form-control-lg" oninput="this.value = this.value.toUpperCase(); updateFullName();" name="guest_middle_name" placeholder="Santos">
+                                        <input type="text" class="form-control form-control-lg"
+                                            oninput="this.value = this.value.toUpperCase(); updateFullName();"
+                                            name="guest_middle_name" placeholder="Santos">
                                     </div>
                                     <input type="hidden" name="guest_name" id="guest_name_hidden">
                                 </div>
@@ -277,11 +293,14 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0;
                                 <div class="row g-3 mb-3">
                                     <div class="col-md-6">
                                         <label class="form-label fw-bold">Contact Number</label>
-                                        <input type="number" class="form-control form-control-lg required" oninput="this.value = this.value.slice(0, 11);" name="guest_phone" placeholder="09123456789">
+                                        <input type="number" class="form-control form-control-lg required"
+                                            oninput="this.value = this.value.slice(0, 11);" name="guest_phone"
+                                            placeholder="09123456789">
                                     </div>
                                     <div class="col-md-6">
                                         <label class="form-label fw-bold">Email Address</label>
-                                        <input type="email" class="form-control form-control-lg required" name="guest_email" placeholder="email@example.com">
+                                        <input type="email" class="form-control form-control-lg required"
+                                            name="guest_email" placeholder="email@example.com">
                                     </div>
                                 </div>
 
@@ -289,8 +308,11 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0;
                                     <div class="col-md-6">
                                         <label class="form-label fw-bold">Check-in - Check-out</label>
                                         <div class="input-group">
-                                            <span class="input-group-text bg-white"><i class="bi bi-calendar-range"></i></span>
-                                            <input type="text" id="date_range" class="form-control form-control-lg bg-white" placeholder="Select Dates" readonly>
+                                            <span class="input-group-text bg-white"><i
+                                                    class="bi bi-calendar-range"></i></span>
+                                            <input type="text" id="date_range"
+                                                class="form-control form-control-lg bg-white" placeholder="Select Dates"
+                                                readonly>
                                         </div>
                                         <input type="hidden" name="checkin" id="checkin">
                                         <input type="hidden" name="checkout" id="checkout">
@@ -299,65 +321,100 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0;
                                     <div class="col-md-6">
                                         <label class="form-label fw-bold">Guests</label>
                                         <div class="dropdown">
-                                            <button class="btn btn-outline-secondary w-100 text-start d-flex justify-content-between align-items-center form-control-lg" type="button" id="guestDropdown" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+                                            <button
+                                                class="btn btn-outline-secondary w-100 text-start d-flex justify-content-between align-items-center form-control-lg"
+                                                type="button" id="guestDropdown" data-bs-toggle="dropdown"
+                                                data-bs-auto-close="outside" aria-expanded="false">
                                                 <span id="guestSummary">1 Adult, 0 Children, 0 Seniors</span>
                                                 <i class="bi bi-chevron-down"></i>
                                             </button>
 
-                                            <div class="dropdown-menu p-3 w-100 shadow border-0 rounded-3" aria-labelledby="guestDropdown" style="min-width: 300px;">
+                                            <div class="dropdown-menu p-3 w-100 shadow border-0 rounded-3"
+                                                aria-labelledby="guestDropdown" style="min-width: 300px;">
                                                 <div class="d-flex justify-content-between align-items-center mb-3">
                                                     <div>
-                                                        <h6 class="mb-0 fw-bold">Adults</h6><small class="text-muted">Ages 18-59</small>
+                                                        <h6 class="mb-0 fw-bold">Adults</h6><small
+                                                            class="text-muted">Ages 18-59</small>
                                                     </div>
                                                     <div class="d-flex align-items-center">
-                                                        <button type="button" class="btn btn-outline-primary btn-sm rounded-circle" onclick="updateCount('adult', -1)" style="width:32px;height:32px;">-</button>
+                                                        <button type="button"
+                                                            class="btn btn-outline-primary btn-sm rounded-circle"
+                                                            onclick="updateCount('adult', -1)"
+                                                            style="width:32px;height:32px;">-</button>
                                                         <span class="mx-3 fw-bold" id="adultCount">1</span>
-                                                        <button type="button" class="btn btn-outline-primary btn-sm rounded-circle" onclick="updateCount('adult', 1)" style="width:32px;height:32px;">+</button>
+                                                        <button type="button"
+                                                            class="btn btn-outline-primary btn-sm rounded-circle"
+                                                            onclick="updateCount('adult', 1)"
+                                                            style="width:32px;height:32px;">+</button>
                                                     </div>
                                                 </div>
                                                 <div class="d-flex justify-content-between align-items-center mb-3">
                                                     <div>
-                                                        <h6 class="mb-0 fw-bold">Children</h6><small class="text-muted">Ages &lt;18</small>
+                                                        <h6 class="mb-0 fw-bold">Children</h6><small
+                                                            class="text-muted">Ages &lt;18</small>
                                                     </div>
                                                     <div class="d-flex align-items-center">
-                                                        <button type="button" class="btn btn-outline-primary btn-sm rounded-circle" onclick="updateCount('child', -1)" style="width:32px;height:32px;">-</button>
+                                                        <button type="button"
+                                                            class="btn btn-outline-primary btn-sm rounded-circle"
+                                                            onclick="updateCount('child', -1)"
+                                                            style="width:32px;height:32px;">-</button>
                                                         <span class="mx-3 fw-bold" id="childCount">0</span>
-                                                        <button type="button" class="btn btn-outline-primary btn-sm rounded-circle" onclick="updateCount('child', 1)" style="width:32px;height:32px;">+</button>
+                                                        <button type="button"
+                                                            class="btn btn-outline-primary btn-sm rounded-circle"
+                                                            onclick="updateCount('child', 1)"
+                                                            style="width:32px;height:32px;">+</button>
                                                     </div>
                                                 </div>
                                                 <div class="d-flex justify-content-between align-items-center mb-3">
                                                     <div>
-                                                        <h6 class="mb-0 fw-bold">Seniors</h6><small class="text-muted">Ages 60+</small>
+                                                        <h6 class="mb-0 fw-bold">Seniors</h6><small
+                                                            class="text-muted">Ages 60+</small>
                                                     </div>
                                                     <div class="d-flex align-items-center">
-                                                        <button type="button" class="btn btn-outline-primary btn-sm rounded-circle" onclick="updateCount('senior', -1)" style="width:32px;height:32px;">-</button>
+                                                        <button type="button"
+                                                            class="btn btn-outline-primary btn-sm rounded-circle"
+                                                            onclick="updateCount('senior', -1)"
+                                                            style="width:32px;height:32px;">-</button>
                                                         <span class="mx-3 fw-bold" id="seniorCount">0</span>
-                                                        <button type="button" class="btn btn-outline-primary btn-sm rounded-circle" onclick="updateCount('senior', 1)" style="width:32px;height:32px;">+</button>
+                                                        <button type="button"
+                                                            class="btn btn-outline-primary btn-sm rounded-circle"
+                                                            onclick="updateCount('senior', 1)"
+                                                            style="width:32px;height:32px;">+</button>
                                                     </div>
                                                 </div>
                                                 <div id="childAgesContainer" class="border-top pt-3 mt-2 d-none">
-                                                    <small class="text-muted d-block mb-2 fw-bold">Child Details:</small>
+                                                    <small class="text-muted d-block mb-2 fw-bold">Child
+                                                        Details:</small>
                                                 </div>
                                                 <div id="adultAgesContainer" class="border-top pt-3 mt-2 d-none">
-                                                    <small class="text-muted d-block mb-2 fw-bold">Adult Details (optional)</small>
+                                                    <small class="text-muted d-block mb-2 fw-bold">Adult Details
+                                                        (optional)</small>
                                                 </div>
                                                 <div id="seniorAgesContainer" class="border-top pt-3 mt-2 d-none">
-                                                    <small class="text-muted d-block mb-2 fw-bold">Senior Details (optional)</small>
+                                                    <small class="text-muted d-block mb-2 fw-bold">Senior Details
+                                                        (optional)</small>
                                                 </div>
                                                 <div class="border-top pt-3 mt-2">
-                                                    <small class="text-muted d-block mb-2 fw-bold">Gender of Primary Guest:</small>
+                                                    <small class="text-muted d-block mb-2 fw-bold">Gender of Primary
+                                                        Guest:</small>
                                                     <div class="d-flex gap-2">
                                                         <div class="form-check">
-                                                            <input class="form-check-input" type="radio" name="gender" id="genderMale" value="Male" checked>
-                                                            <label class="form-check-label" for="genderMale">Male</label>
+                                                            <input class="form-check-input" type="radio" name="gender"
+                                                                id="genderMale" value="Male" checked>
+                                                            <label class="form-check-label"
+                                                                for="genderMale">Male</label>
                                                         </div>
                                                         <div class="form-check">
-                                                            <input class="form-check-input" type="radio" name="gender" id="genderFemale" value="Female">
-                                                            <label class="form-check-label" for="genderFemale">Female</label>
+                                                            <input class="form-check-input" type="radio" name="gender"
+                                                                id="genderFemale" value="Female">
+                                                            <label class="form-check-label"
+                                                                for="genderFemale">Female</label>
                                                         </div>
                                                         <div class="form-check">
-                                                            <input class="form-check-input" type="radio" name="gender" id="genderOther" value="Other">
-                                                            <label class="form-check-label" for="genderOther">Other</label>
+                                                            <input class="form-check-input" type="radio" name="gender"
+                                                                id="genderOther" value="Other">
+                                                            <label class="form-check-label"
+                                                                for="genderOther">Other</label>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -373,10 +430,13 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0;
                                     <div class="col-md-6">
                                         <label class="form-label fw-bold">Tourist Type</label>
                                         <div class="btn-group w-100" role="group">
-                                            <input type="radio" class="btn-check" name="tourist_type" id="touristLocal" value="Local" checked>
+                                            <input type="radio" class="btn-check" name="tourist_type" id="touristLocal"
+                                                value="Local" checked>
                                             <label class="btn btn-outline-primary w-50" for="touristLocal">Local</label>
-                                            <input type="radio" class="btn-check" name="tourist_type" id="touristForeign" value="Foreign">
-                                            <label class="btn btn-outline-primary w-50" for="touristForeign">Foreign</label>
+                                            <input type="radio" class="btn-check" name="tourist_type"
+                                                id="touristForeign" value="Foreign">
+                                            <label class="btn btn-outline-primary w-50"
+                                                for="touristForeign">Foreign</label>
                                         </div>
                                     </div>
                                 </div>
@@ -385,10 +445,14 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0;
                                     <div class="card-body d-flex justify-content-between align-items-center">
                                         <div>
                                             <h6 class="mb-0 fw-bold text-primary">Total Room Cost</h6>
-                                            <small class="text-muted"><span id="nights_display">0</span> Nights Stay</small>
+                                            <small class="text-muted"><span id="nights_display">0</span> Nights
+                                                Stay</small>
                                         </div>
                                         <div class="text-end">
-                                            <input type="text" class="fw-bold fs-4 bg-transparent border-0 text-end text-primary" style="width: 150px;" id="room_cost" name="room_cost" readonly placeholder="₱0.00">
+                                            <input type="text"
+                                                class="fw-bold fs-4 bg-transparent border-0 text-end text-primary"
+                                                style="width: 150px;" id="room_cost" name="room_cost" readonly
+                                                placeholder="₱0.00">
                                             <input type="hidden" id="nights" name="totalNights">
                                         </div>
                                     </div>
@@ -407,23 +471,34 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0;
                                             $formatted_date = date("F d, Y", strtotime($event['event_date']));
                                             $formatted_time = date("h:i A", $event_datetime);
                                             $formatted_end = !empty($event['event_end_time']) ? date("h:i A", strtotime($event['event_date'] . ' ' . $event['event_end_time'])) : '';
-                                    ?>
-                                        <div class="col-md-6">
-                                            <div class="card event-option-card border-2 cursor-pointer" style="cursor: pointer; transition: all 0.3s; border-color: #e9ecef;">
-                                                <div class="card-body">
-                                                    <div class="form-check mb-0">
-                                                        <input class="form-check-input event-checkbox" type="checkbox" name="events[]" value="<?= $event['event_id'] ?>" id="event<?= $event['event_id'] ?>" data-event-name="<?= htmlspecialchars($event['event_name']) ?>" data-guests="1">
-                                                        <label class="form-check-label w-100" for="event<?= $event['event_id'] ?>" style="cursor: pointer;">
-                                                            <h6 class="fw-bold mb-2" style="color: #0d6efd;"><?= htmlspecialchars($event['event_name']) ?></h6>
-                                                            <small class="text-muted d-block">📅 <?= $formatted_date ?></small>
-                                                            <small class="text-muted d-block">🕐 <?= $formatted_time ?><?php if ($formatted_end) echo " - " . $formatted_end; ?></small>
-                                                            <small class="text-muted d-block mt-2"><?= htmlspecialchars(substr($event['description'], 0, 50)) ?>...</small>
-                                                        </label>
+                                            ?>
+                                            <div class="col-md-6">
+                                                <div class="card event-option-card border-2 cursor-pointer"
+                                                    style="cursor: pointer; transition: all 0.3s; border-color: #e9ecef;">
+                                                    <div class="card-body">
+                                                        <div class="form-check mb-0">
+                                                            <input class="form-check-input event-checkbox" type="checkbox"
+                                                                name="events[]" value="<?= $event['event_id'] ?>"
+                                                                id="event<?= $event['event_id'] ?>"
+                                                                data-event-name="<?= htmlspecialchars($event['event_name']) ?>"
+                                                                data-guests="1">
+                                                            <label class="form-check-label w-100"
+                                                                for="event<?= $event['event_id'] ?>" style="cursor: pointer;">
+                                                                <h6 class="fw-bold mb-2" style="color: #0d6efd;">
+                                                                    <?= htmlspecialchars($event['event_name']) ?></h6>
+                                                                <small class="text-muted d-block">📅
+                                                                    <?= $formatted_date ?></small>
+                                                                <small class="text-muted d-block">🕐
+                                                                    <?= $formatted_time ?>        <?php if ($formatted_end)
+                                                                                  echo " - " . $formatted_end; ?></small>
+                                                                <small
+                                                                    class="text-muted d-block mt-2"><?= htmlspecialchars(substr($event['description'], 0, 50)) ?>...</small>
+                                                            </label>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    <?php
+                                            <?php
                                         }
                                     } else {
                                         echo '<div class="col-12"><p class="text-muted text-center">No events available for your booking period</p></div>';
@@ -456,7 +531,10 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0;
                                             $boat_rental_fee = $conn->query("SELECT * FROM boat_rental_fee_tbl");
                                             while ($boat = $boat_rental_fee->fetch_assoc()) { ?>
                                                 <tr>
-                                                    <td><input class="form-check-input boat-check" type="checkbox" value="<?= $boat['rental_id'] ?>" data-boat="<?= $boat['amount'] ?>" data-island="<?= $boat['island_hopping_amount'] ?>"></td>
+                                                    <td><input class="form-check-input boat-check" type="checkbox"
+                                                            value="<?= $boat['rental_id'] ?>"
+                                                            data-boat="<?= $boat['amount'] ?>"
+                                                            data-island="<?= $boat['island_hopping_amount'] ?>"></td>
                                                     <td><?= $boat['destination'] ?></td>
                                                     <td><?= $boat['min_guest'] . '-' . $boat['max_guest'] ?></td>
                                                     <td>₱<?= number_format($boat['amount'], 2) ?></td>
@@ -467,7 +545,8 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0;
                                         </tbody>
                                     </table>
                                 </div>
-                                <h5 class="text-end mt-3">Total Boat Fee: <span class="text-success fw-bold">₱<span id="totalAmount">0.00</span></span></h5>
+                                <h5 class="text-end mt-3">Total Boat Fee: <span class="text-success fw-bold">₱<span
+                                            id="totalAmount">0.00</span></span></h5>
                             </div>
 
                             <div class="form-step d-none">
@@ -479,16 +558,23 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0;
                                         <div class="col-md-6">
                                             <div class="card h-100 border rounded-3 p-3 d-flex flex-row align-items-center">
                                                 <div class="form-check me-3">
-                                                    <input class="form-check-input service-check" type="checkbox" name="services[]" value="<?= $service['service_id'] ?>" data-price="<?= $service['service_price'] ?>">
+                                                    <input class="form-check-input service-check" type="checkbox"
+                                                        name="services[]" value="<?= $service['service_id'] ?>"
+                                                        data-price="<?= $service['service_price'] ?>">
                                                 </div>
-                                                <img src="./../user/admin/uploads/<?= $service['service_image'] ?>" style="width:60px; height:60px; object-fit:cover; border-radius:8px;" class="me-3">
+                                                <img src="./../user/admin/uploads/<?= $service['service_image'] ?>"
+                                                    style="width:60px; height:60px; object-fit:cover; border-radius:8px;"
+                                                    class="me-3">
                                                 <div>
                                                     <h6 class="mb-0 fw-bold"><?= $service['service_name'] ?></h6>
-                                                    <small class="text-muted">₱<?= number_format($service['service_price'], 2) ?></small>
+                                                    <small
+                                                        class="text-muted">₱<?= number_format($service['service_price'], 2) ?></small>
                                                     <?php if (!empty($service['service_description']) || !empty($service['service_inclusions'])): ?>
                                                         <div class="service-details mt-2 d-none small text-muted">
                                                             <?php if (!empty($service['service_description'])): ?>
-                                                                <div class="mb-1"><?= nl2br(htmlspecialchars($service['service_description'])) ?></div>
+                                                                <div class="mb-1">
+                                                                    <?= nl2br(htmlspecialchars($service['service_description'])) ?>
+                                                                </div>
                                                             <?php endif; ?>
                                                             <?php if (!empty($service['service_inclusions'])): ?>
                                                                 <div class="fw-bold">Inclusions:</div>
@@ -519,9 +605,10 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0;
                                                 <div class="form-check me-3">
                                                     <div class="rental-duration mt-2 d-none">
                                                         <label class="small text-muted">Duration</label>
-                                                        <select class="form-select form-select-sm rental-duration-select" data-base-hours="<?= $rental['hours'] ?>" style="width:120px;">
+                                                        <select class="form-select form-select-sm rental-duration-select"
+                                                            data-base-hours="<?= $rental['hours'] ?>" style="width:120px;">
                                                             <?php
-                                                            $base = (int)$rental['hours'];
+                                                            $base = (int) $rental['hours'];
                                                             $maxBlocks = 8; // allow up to 8 blocks (adjustable)
                                                             for ($m = 1; $m <= $maxBlocks; $m++) {
                                                                 $hrs = $base * $m;
@@ -530,12 +617,18 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0;
                                                             ?>
                                                         </select>
                                                     </div>
-                                                    <input class="form-check-input rental-check" type="checkbox" name="rentals[]" value="<?= $rental['rental_id'] ?>" data-price="<?= $rental['rental_price'] ?>">
+                                                    <input class="form-check-input rental-check" type="checkbox"
+                                                        name="rentals[]" value="<?= $rental['rental_id'] ?>"
+                                                        data-price="<?= $rental['rental_price'] ?>">
                                                 </div>
-                                                <img src="./../user/admin/uploads/rentals/<?= $rental['rental_image'] ?>" style="width:60px; height:60px; object-fit:cover; border-radius:8px;" class="me-3">
+                                                <img src="./../user/admin/uploads/rentals/<?= $rental['rental_image'] ?>"
+                                                    style="width:60px; height:60px; object-fit:cover; border-radius:8px;"
+                                                    class="me-3">
                                                 <div>
                                                     <h6 class="mb-0 fw-bold"><?= $rental['rental_name'] ?></h6>
-                                                    <small class="text-muted">₱<?= number_format($rental['rental_price'], 2) ?> / <?= $rental['hours'] ?>hr</small>
+                                                    <small
+                                                        class="text-muted">₱<?= number_format($rental['rental_price'], 2) ?>
+                                                        / <?= $rental['hours'] ?>hr</small>
                                                 </div>
                                             </div>
                                         </div>
@@ -548,7 +641,8 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0;
 
                                 <!-- Summary of All Selected Items -->
                                 <div class="card border-0 bg-white mb-4 shadow-sm">
-                                    <div class="card-header bg-light d-flex justify-content-between align-items-center" style="cursor: pointer;" data-bs-toggle="collapse" href="#summaryPanel">
+                                    <div class="card-header bg-light d-flex justify-content-between align-items-center"
+                                        style="cursor: pointer;" data-bs-toggle="collapse" href="#summaryPanel">
                                         <h6 class="mb-0 fw-bold">Booking Summary</h6>
                                         <i class="bi bi-chevron-down"></i>
                                     </div>
@@ -590,20 +684,31 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0;
                                 </div>
 
                                 <div class="bg-light p-4 rounded-4 mb-4 border">
-                                    <div class="d-flex justify-content-between mb-2 text-muted"><span>Room Fee</span> <input class="border-0 bg-transparent text-end fw-bold text-dark" id="room_payment" readonly></div>
+                                    <div class="d-flex justify-content-between mb-2 text-muted"><span>Room Fee</span>
+                                        <input class="border-0 bg-transparent text-end fw-bold text-dark"
+                                            id="room_payment" readonly></div>
 
                                     <div class="d-flex justify-content-between mb-2 text-primary">
                                         <span>Entrance Fee (<span id="guest_summary_count">1</span> Guests)</span>
-                                        <input class="border-0 bg-transparent text-end fw-bold text-primary" id="entrance_payment" readonly>
+                                        <input class="border-0 bg-transparent text-end fw-bold text-primary"
+                                            id="entrance_payment" readonly>
                                     </div>
 
-                                    <div class="d-flex justify-content-between mb-2 text-muted"><span>Boat Fee</span> <input class="border-0 bg-transparent text-end" id="boat_rentals_payment" readonly></div>
-                                    <div class="d-flex justify-content-between mb-2 text-muted"><span>Services Fee</span> <input class="border-0 bg-transparent text-end" id="services_payment" readonly></div>
-                                    <div class="d-flex justify-content-between mb-2 text-muted"><span>Rentals Fee</span> <input class="border-0 bg-transparent text-end" id="rentals_payment" readonly></div>
+                                    <div class="d-flex justify-content-between mb-2 text-muted"><span>Boat Fee</span>
+                                        <input class="border-0 bg-transparent text-end" id="boat_rentals_payment"
+                                            readonly></div>
+                                    <div class="d-flex justify-content-between mb-2 text-muted"><span>Services
+                                            Fee</span> <input class="border-0 bg-transparent text-end"
+                                            id="services_payment" readonly></div>
+                                    <div class="d-flex justify-content-between mb-2 text-muted"><span>Rentals Fee</span>
+                                        <input class="border-0 bg-transparent text-end" id="rentals_payment" readonly>
+                                    </div>
                                     <hr>
                                     <div class="d-flex justify-content-between align-items-center">
                                         <span class="fs-5 fw-bold">Total Amount</span>
-                                        <input type="text" name="total_payments" class="fs-4 fw-bold text-dark text-end border-0 bg-transparent" id="total_payment" readonly>
+                                        <input type="text" name="total_payments"
+                                            class="fs-4 fw-bold text-dark text-end border-0 bg-transparent"
+                                            id="total_payment" readonly>
                                         <input type="hidden" name="total_entrance_fee" id="total_entrance_fee_value">
                                     </div>
                                 </div>
@@ -611,7 +716,8 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0;
                                 <div class="row g-3">
                                     <div class="col-md-6">
                                         <label class="form-label fw-bold">Payment Method</label>
-                                        <select class="form-select form-select-lg required" id="payment_type" name="payment_type">
+                                        <select class="form-select form-select-lg required" id="payment_type"
+                                            name="payment_type">
                                             <option value="">Select Method</option>
                                             <?php
                                             $query = $conn->query("SELECT * FROM payment_type_tbl");
@@ -623,36 +729,43 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0;
                                     </div>
                                     <div class="col-md-6">
                                         <label class="form-label fw-bold">Account Number</label>
-                                        <input type="text" class="form-control form-control-lg" id="payment_number" readonly>
+                                        <input type="text" class="form-control form-control-lg" id="payment_number"
+                                            readonly>
                                     </div>
 
                                     <div class="col-md-6">
                                         <label class="form-label fw-bold text-primary">Payment Option</label>
-                                        <select class="form-select form-select-lg required border-primary" id="payment_option" name="payment_option">
+                                        <select class="form-select form-select-lg required border-primary"
+                                            id="payment_option" name="payment_option">
                                             <option value="full">Full Payment</option>
                                             <option value="downpayment">50% Downpayment</option>
                                         </select>
                                     </div>
                                     <div class="col-md-6">
                                         <label class="form-label fw-bold">Reference No.</label>
-                                        <input type="text" class="form-control form-control-lg required" name="reference_number" placeholder="Enter Ref No.">
+                                        <input type="text" class="form-control form-control-lg required"
+                                            name="reference_number" placeholder="Enter Ref No.">
                                     </div>
 
                                     <div class="col-md-6">
                                         <label class="form-label fw-bold">Amount to Pay Now</label>
-                                        <input type="text" class="form-control form-control-lg fw-bold text-success bg-light" id="amount_to_pay_display" readonly>
+                                        <input type="text"
+                                            class="form-control form-control-lg fw-bold text-success bg-light"
+                                            id="amount_to_pay_display" readonly>
                                         <input type="hidden" name="final_payable" id="final_payable">
                                     </div>
                                     <div class="col-md-6">
                                         <label class="form-label fw-bold">Proof of Payment</label>
-                                        <input type="file" class="form-control form-control-lg required" name="payment_screenshot" accept="image/*">
+                                        <input type="file" class="form-control form-control-lg required"
+                                            name="payment_screenshot" accept="image/*">
                                     </div>
                                 </div>
 
                                 <div class="alert alert-info mt-3 d-flex align-items-center">
                                     <i class="bi bi-info-circle-fill fs-4 me-2"></i>
                                     <div>
-                                        A minimum of <strong>50% downpayment</strong> is required to confirm your reservation.
+                                        A minimum of <strong>50% downpayment</strong> is required to confirm your
+                                        reservation.
                                         Balance can be paid upon arrival.
                                     </div>
                                 </div>
@@ -661,25 +774,30 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0;
                             <div class="form-step d-none text-center py-4">
                                 <i class="bi bi-check-circle-fill text-success display-1"></i>
                                 <h3 class="mt-3 fw-bold">Almost Done!</h3>
-                                <p class="text-muted">Please review your details. By clicking confirm, you agree to our terms.</p>
+                                <p class="text-muted">Please review your details. By clicking confirm, you agree to our
+                                    terms.</p>
 
                                 <div class="form-check d-inline-block text-start bg-light p-3 rounded-3 mt-3">
                                     <input class="form-check-input" type="checkbox" id="termsCheckbox">
                                     <label class="form-check-label" for="termsCheckbox">
-                                        I agree to the <a href="#termsModal" data-bs-toggle="modal">Terms and Conditions</a>
+                                        I agree to the <a href="#termsModal" data-bs-toggle="modal">Terms and
+                                            Conditions</a>
                                     </label>
                                 </div>
 
                                 <div class="mt-4">
-                                    <button type="button" id="confirmBookingBtn" class="btn btn-success btn-lg px-5 rounded-pill shadow" disabled>
+                                    <button type="button" id="confirmBookingBtn"
+                                        class="btn btn-success btn-lg px-5 rounded-pill shadow" disabled>
                                         Confirm Booking
                                     </button>
                                 </div>
                             </div>
 
                             <div class="d-flex justify-content-between mt-5 pt-3 border-top">
-                                <button type="button" id="prevBtn" class="btn btn-outline-secondary px-4 rounded-pill" disabled>Back</button>
-                                <button type="button" id="nextBtn" class="btn btn-primary px-4 rounded-pill shadow-sm">Next</button>
+                                <button type="button" id="prevBtn" class="btn btn-outline-secondary px-4 rounded-pill"
+                                    disabled>Back</button>
+                                <button type="button" id="nextBtn"
+                                    class="btn btn-primary px-4 rounded-pill shadow-sm">Next</button>
                             </div>
                         </form>
                     </div>
@@ -697,19 +815,24 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0;
                 </div>
                 <div class="modal-body" style="max-height:400px; overflow-y:auto;">
                     <h6>Beach Front Resort</h6>
-                    <p>Welcome to Beach Front Resort! By booking a stay, visiting, or using our facilities, you agree to comply with the following Terms and Conditions.</p>
+                    <p>Welcome to Beach Front Resort! By booking a stay, visiting, or using our facilities, you agree to
+                        comply with the following Terms and Conditions.</p>
 
                     <h6>1. Reservations & Payments</h6>
                     <ol>
                         <li>Reservations can be made through our official booking channels.</li>
-                        <li>A reservation is only confirmed upon receipt of full payment via GCash or Bank Transfer.</li>
-                        <li>All rates are subject to change without prior notice but will not affect confirmed bookings.</li>
+                        <li>A reservation is only confirmed upon receipt of full payment via GCash or Bank Transfer.
+                        </li>
+                        <li>All rates are subject to change without prior notice but will not affect confirmed bookings.
+                        </li>
                     </ol>
 
                     <h6>2. Check-in & Check-out</h6>
                     <ol>
-                        <li>For early check-in at 8:00 AM, check-out time is set at 5:00 AM the next day (21-hour stay).</li>
-                        <li>Early check-in (12:00 NN) or late check-out is subject to room availability and extra charges.</li>
+                        <li>For early check-in at 8:00 AM, check-out time is set at 5:00 AM the next day (21-hour stay).
+                        </li>
+                        <li>Early check-in (12:00 NN) or late check-out is subject to room availability and extra
+                            charges.</li>
                         <li>Guests must present reservation copy and payment proof upon check-in.</li>
                     </ol>
 
@@ -943,7 +1066,7 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0;
             minDate: "today",
             dateFormat: "Y-m-d",
             showMonths: 2,
-            onChange: function(selectedDates, dateStr, instance) {
+            onChange: function (selectedDates, dateStr, instance) {
                 if (selectedDates.length === 2) {
                     document.getElementById("checkin").value = instance.formatDate(selectedDates[0], "Y-m-d");
                     document.getElementById("checkout").value = instance.formatDate(selectedDates[1], "Y-m-d");
@@ -954,7 +1077,7 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0;
 
         // 3. STEP LOGIC & PAYMENT
         // automatically clear invalid styles when user types
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             document.querySelectorAll('.required').forEach(input => {
                 input.addEventListener('input', () => input.classList.remove('is-invalid'));
             });
@@ -965,7 +1088,7 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0;
             });
             // Add gender radio button listeners
             document.querySelectorAll('input[name="gender"]').forEach(radio => {
-                radio.addEventListener('change', function() {
+                radio.addEventListener('change', function () {
                     document.getElementById('inputGender').value = this.value;
                 });
             });
@@ -989,7 +1112,7 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0;
             nextBtn.textContent = step === formSteps.length - 1 ? "" : "Next";
 
             if (step === 5) calculateSummary(); // Payment Step is now index 5 (after Events)
-            
+
             // Scroll to top of form
             document.querySelector('.card-body').scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
@@ -1018,7 +1141,7 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0;
                     showStep(currentStep);
                     return;
                 }
-                
+
                 // For going forward, validate current step first
                 if (index > currentStep) {
                     // Validate all steps from current to target step
@@ -1234,7 +1357,7 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0;
         // Boat selection: allow only one selection at a time. When a boat is selected,
         // disable other boat checkboxes and show the island-hop option only for the selected row.
         document.querySelectorAll('.boat-check').forEach(cb => {
-            cb.addEventListener('change', function() {
+            cb.addEventListener('change', function () {
                 if (this.checked) {
                     // disable other boat choices
                     document.querySelectorAll('.boat-check').forEach(o => {
@@ -1271,7 +1394,7 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0;
 
         // Service details toggles
         document.querySelectorAll('.service-detail-toggle').forEach(btn => {
-            btn.addEventListener('click', function(e) {
+            btn.addEventListener('click', function (e) {
                 e.preventDefault();
                 const details = this.previousElementSibling;
                 if (!details) return;
@@ -1282,7 +1405,7 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0;
 
         // Rental selection: show duration select when rental is checked
         document.querySelectorAll('.rental-check').forEach(cb => {
-            cb.addEventListener('change', function() {
+            cb.addEventListener('change', function () {
                 const card = this.closest('.card');
                 const dur = card ? card.querySelector('.rental-duration') : null;
                 const sel = card ? card.querySelector('.rental-duration-select') : null;
@@ -1323,7 +1446,7 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0;
 
         // Event checkbox handling for visual feedback and summary
         document.querySelectorAll('.event-checkbox').forEach(checkbox => {
-            checkbox.addEventListener('change', function() {
+            checkbox.addEventListener('change', function () {
                 const card = this.closest('.event-option-card');
                 if (this.checked) {
                     card.style.borderColor = '#0d6efd';
@@ -1337,7 +1460,7 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0;
 
             // Make the entire card clickable
             const card = checkbox.closest('.event-option-card');
-            card.addEventListener('click', function(e) {
+            card.addEventListener('click', function (e) {
                 if (e.target !== checkbox) {
                     checkbox.checked = !checkbox.checked;
                     checkbox.dispatchEvent(new Event('change'));
@@ -1353,11 +1476,11 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0;
             if (selectedEvents.length > 0) {
                 selectedEventsInfo.classList.remove('d-none');
                 selectedEventsList.innerHTML = '';
-                
+
                 selectedEvents.forEach(checkbox => {
                     const eventName = checkbox.dataset.eventName;
                     const eventId = checkbox.value;
-                    
+
                     const eventItem = document.createElement('div');
                     eventItem.className = 'alert alert-info alert-dismissible fade show mb-2';
                     eventItem.innerHTML = `
@@ -1388,9 +1511,9 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0;
         const confirmBtn = document.getElementById("confirmBookingBtn");
         checkbox.addEventListener('change', () => confirmBtn.disabled = !checkbox.checked);
 
-        confirmBtn.addEventListener("click", function() {
-            // ensure full name hidden field is updated from split inputs
+        confirmBtn.addEventListener("click", function () {
             updateFullName();
+
             Swal.fire({
                 title: "Confirm Booking?",
                 text: "Do you want to confirm this reservation?",
@@ -1403,59 +1526,74 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0;
                     let form = document.getElementById("multiStepForm");
                     let formData = new FormData(form);
 
-                    // Append boat rentals manually
+                    // --- CALCULATE GENDER TOTALS ---
+                    let maleCount = 0;
+                    let femaleCount = 0;
+
+                    // 1. Primary Guest Gender
+                    const primaryGender = document.querySelector('input[name="gender"]:checked').value;
+                    if (primaryGender === "Male") maleCount++;
+                    else if (primaryGender === "Female") femaleCount++;
+
+                    // 2. Count Adult Genders (Starting from index 1 because index 0 is the primary guest)
+                    document.querySelectorAll('select[name="adult_genders[]"]').forEach((sel, index) => {
+                        if (index === 0) return; // Skip first adult if handled by primary gender radio
+                        if (sel.value === "Male") maleCount++;
+                        else if (sel.value === "Female") femaleCount++;
+                    });
+
+                    // 3. Count Children and Seniors
+                    ['child_genders[]', 'senior_genders[]'].forEach(name => {
+                        document.querySelectorAll(`select[name="${name}"]`).forEach(sel => {
+                            if (sel.value === "Male") maleCount++;
+                            else if (sel.value === "Female") femaleCount++;
+                        });
+                    });
+
+                    formData.append('total_male', maleCount);
+                    formData.append('total_female', femaleCount);
+
+                    // Append boat rentals logic (Keep your existing code)
                     document.querySelectorAll('.boat-check').forEach((cb) => {
                         if (cb.checked) {
-                            const rental_id = cb.value;
-                            const amount = parseFloat(cb.dataset.boat);
-                            const island_amount = parseFloat(cb.dataset.island);
-                            const includeIsland = cb.closest('tr').querySelector('.include-island').checked ? 1 : 0;
-                            const totalAmount = includeIsland ? (amount + island_amount) : amount;
-                            formData.append('boat_rentals[]', `${rental_id}:${includeIsland}:${totalAmount}`);
+                            const parts = [
+                                cb.value,
+                                cb.closest('tr').querySelector('.include-island').checked ? 1 : 0,
+                                cb.closest('tr').querySelector('.include-island').checked ? (parseFloat(cb.dataset.boat) + parseFloat(cb.dataset.island)) : parseFloat(cb.dataset.boat)
+                            ];
+                            formData.append('boat_rentals[]', parts.join(':'));
                         }
                     });
 
                     Swal.fire({
                         title: 'Processing...',
-                        text: 'Please wait while we save your reservation',
+                        text: 'Please wait...',
                         allowOutsideClick: false,
-                        didOpen: () => {
-                            Swal.showLoading();
-                        }
+                        didOpen: () => { Swal.showLoading(); }
                     });
 
-                    fetch("confirm_booking.php", {
-                            method: "POST",
-                            body: formData
-                        })
+                    fetch("confirm_booking.php", { method: "POST", body: formData })
                         .then(res => res.json())
                         .then(data => {
                             if (data.status === "success") {
-                                Swal.fire({
-                                    title: "Booked!",
-                                    text: data.message,
-                                    icon: "success"
-                                }).then(() => {
+                                Swal.fire("Success!", data.message, "success").then(() => {
                                     window.location.href = "tracking";
                                 });
                             } else {
                                 Swal.fire("Error", data.message, "error");
                             }
-                        })
-                        .catch(err => {
-                            Swal.fire("Error", "Something went wrong: " + err, "error");
                         });
                 }
             });
         });
 
-        document.getElementById("payment_type").addEventListener("change", function() {
+        document.getElementById("payment_type").addEventListener("change", function () {
             let selectedOption = this.options[this.selectedIndex];
             document.getElementById("payment_number").value = selectedOption.getAttribute("data-number") || "";
         });
 
         // Modal Accept Button Logic
-        document.querySelector("#termsModal .btn-primary").addEventListener("click", function() {
+        document.querySelector("#termsModal .btn-primary").addEventListener("click", function () {
             document.getElementById("termsCheckbox").checked = true;
             document.getElementById("confirmBookingBtn").disabled = false;
         });

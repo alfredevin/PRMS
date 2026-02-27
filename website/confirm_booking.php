@@ -15,222 +15,157 @@ require './../mailer/src/Exception.php';
 require './../mailer/src/PHPMailer.php';
 require './../mailer/src/SMTP.php';
 
-// Default response
 $response = ["status" => "error", "message" => "Unknown error"];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Collect POST data safely
-    $room_id       = $_POST['room_id'] ?? null;
-    $guest_name    = $_POST['guest_name'] ?? '';
-    $guest_email   = $_POST['guest_email'] ?? '';
-    $guest_phone   = $_POST['guest_phone'] ?? '';
-    $check_in      = $_POST['checkin'] ?? '';
-    $check_out     = $_POST['checkout'] ?? '';
-    $guests        = (int)($_POST['guests'] ?? 0);
-    $total_nights  = (int)($_POST['totalNights'] ?? 0);
-    $total_price   = isset($_POST['total_payments']) ? floatval(str_replace([',', '₱'], '', $_POST['total_payments'])) : 0; // Clean currency string
+    // Collect POST data
+    $room_id = $_POST['room_id'] ?? null;
+    $guest_name = $_POST['guest_name'] ?? '';
+    $guest_email = $_POST['guest_email'] ?? '';
+    $guest_phone = $_POST['guest_phone'] ?? '';
+    $check_in = $_POST['checkin'] ?? '';
+    $check_out = $_POST['checkout'] ?? '';
+    $guests = (int) ($_POST['guests'] ?? 0);
+    $total_nights = (int) ($_POST['totalNights'] ?? 0);
+    $total_price = isset($_POST['total_payments']) ? floatval(str_replace([',', '₱'], '', $_POST['total_payments'])) : 0;
+
+    // NEW: Aggregated Genders from JavaScript
+    $total_male = (int) ($_POST['total_male'] ?? 0);
+    $total_female = (int) ($_POST['total_female'] ?? 0);
     $tracking_number = 'RES' . time() . rand(100, 999);
 
-    // Check room info
-    $room_sql = "SELECT * FROM rooms_tbl
-        INNER JOIN room_type_tbl ON room_type_tbl.room_type_id = rooms_tbl.room_type_id 
-        WHERE room_id = '" . mysqli_real_escape_string($conn, $room_id) . "'";
+    // SQL Protection
+    $room_id_safe = mysqli_real_escape_string($conn, $room_id);
 
+    // Check room info for email
+    $room_sql = "SELECT room_type_name FROM rooms_tbl 
+                 INNER JOIN room_type_tbl ON room_type_tbl.room_type_id = rooms_tbl.room_type_id 
+                 WHERE room_id = '$room_id_safe'";
     $room_result = mysqli_query($conn, $room_sql);
-    if (!$room_result) {
-        echo json_encode(["status" => "error", "message" => "DB Error (room): " . mysqli_error($conn)]);
-        exit;
-    }
-    $room = mysqli_fetch_assoc($room_result);
-    $room_name = $room['room_type_name'] ?? 'Unknown';
+    $room_data = mysqli_fetch_assoc($room_result);
+    $room_name = $room_data['room_type_name'] ?? 'Unknown';
 
-    // Check availability
-    $check_sql = "SELECT available FROM rooms_tbl WHERE room_id = '" . mysqli_real_escape_string($conn, $room_id) . "'";
-    $check_result = mysqli_query($conn, $check_sql);
-    if (!$check_result) {
-        echo json_encode(["status" => "error", "message" => "DB Error (availability): " . mysqli_error($conn)]);
-        exit;
-    }
-    $room_avail = mysqli_fetch_assoc($check_result);
-
-    if ($guests > 0 ) {
-        // Insert reservation
+    if ($guests > 0) {
+        // 1. Insert reservation (Including Gender Totals)
         $insert_sql = "INSERT INTO reservation_tbl 
-            (room_id, guest_name, guest_email, guest_phone, check_in, check_out, guests, total_nights, total_price, tracking_number) 
+            (room_id, guest_name, guest_email, guest_phone, check_in, check_out, guests, total_nights, total_price, tracking_number, total_male, total_female) 
             VALUES (
-                '" . mysqli_real_escape_string($conn, $room_id) . "',
+                '$room_id_safe',
                 '" . mysqli_real_escape_string($conn, $guest_name) . "',
                 '" . mysqli_real_escape_string($conn, $guest_email) . "',
                 '" . mysqli_real_escape_string($conn, $guest_phone) . "',
                 '" . mysqli_real_escape_string($conn, $check_in) . "',
                 '" . mysqli_real_escape_string($conn, $check_out) . "',
-                '$guests',
-                '$total_nights',
-                '$total_price',
-                '$tracking_number'
+                '$guests', '$total_nights', '$total_price', '$tracking_number', '$total_male', '$total_female'
             )";
 
         if (mysqli_query($conn, $insert_sql)) {
             $reservation_id = mysqli_insert_id($conn);
 
-            // --- UPDATED GUEST LOGIC ---
-            $adult_count = isset($_POST['adults']) ? (int)$_POST['adults'] : 1;
-            $child_ages  = isset($_POST['child_ages']) ? $_POST['child_ages'] : [];
-            $adult_ages  = isset($_POST['adult_ages']) ? $_POST['adult_ages'] : [];
-            $senior_count = isset($_POST['seniors']) ? (int)$_POST['seniors'] : 0;
-            $senior_ages  = isset($_POST['senior_ages']) ? $_POST['senior_ages'] : [];
+            // 2. Insert Individual Guests with Genders
+            $adult_ages = $_POST['adult_ages'] ?? [];
+            $adult_genders = $_POST['adult_genders'] ?? [];
+            $child_ages = $_POST['child_ages'] ?? [];
+            $child_genders = $_POST['child_genders'] ?? [];
+            $senior_ages = $_POST['senior_ages'] ?? [];
+            $senior_genders = $_POST['senior_genders'] ?? [];
+            $primary_gender = $_POST['inputGender'] ?? 'Male';
 
-            $guest_stmt = $conn->prepare("INSERT INTO reservation_guests_tbl (reservation_id, age, category, pwd) VALUES (?, ?, ?, ?)");
+            $guest_stmt = $conn->prepare("INSERT INTO reservation_guests_tbl (reservation_id, age, category, gender, pwd) VALUES (?, ?, ?, ?, ?)");
 
-            // 1. INSERT ADULTS
-            for ($i = 0; $i < $adult_count; $i++) {
-                $age = isset($adult_ages[$i]) && is_numeric($adult_ages[$i]) ? (int)$adult_ages[$i] : 0;
-                $category = 'Adult';
+            // Adults
+            foreach ($adult_ages as $i => $age) {
+                $gen = ($i === 0) ? $primary_gender : ($adult_genders[$i] ?? 'Male');
+                $cat = 'Adult';
                 $pwd = 'No';
-                
-                $guest_stmt->bind_param("iiss", $reservation_id, $age, $category, $pwd);
+                $age_val = (int) $age;
+                $guest_stmt->bind_param("iisss", $reservation_id, $age_val, $cat, $gen, $pwd);
                 $guest_stmt->execute();
             }
-
-            // 2. INSERT CHILDREN
-            if (!empty($child_ages) && is_array($child_ages)) {
-                foreach ($child_ages as $age_val) {
-                    $age = (int)$age_val; 
-                    $category = 'Child';
-                    $pwd = 'No';       
-                    
-                    $guest_stmt->bind_param("iiss", $reservation_id, $age, $category, $pwd);
-                    $guest_stmt->execute();
-                }
-            }
-
-            // 3. INSERT SENIORS
-            for ($i = 0; $i < $senior_count; $i++) {
-                $age = isset($senior_ages[$i]) && is_numeric($senior_ages[$i]) ? (int)$senior_ages[$i] : 0;
-                $category = 'Senior';
+            // Children
+            foreach ($child_ages as $i => $age) {
+                $gen = $child_genders[$i] ?? 'Male';
+                $cat = 'Child';
                 $pwd = 'No';
-
-                $guest_stmt->bind_param("iiss", $reservation_id, $age, $category, $pwd);
+                $age_val = (int) $age;
+                $guest_stmt->bind_param("iisss", $reservation_id, $age_val, $cat, $gen, $pwd);
                 $guest_stmt->execute();
             }
-
+            // Seniors
+            foreach ($senior_ages as $i => $age) {
+                $gen = $senior_genders[$i] ?? 'Male';
+                $cat = 'Senior';
+                $pwd = 'No';
+                $age_val = (int) $age;
+                $guest_stmt->bind_param("iisss", $reservation_id, $age_val, $cat, $gen, $pwd);
+                $guest_stmt->execute();
+            }
             $guest_stmt->close();
 
-            // Event Bookings
+            // 3. Events
             if (!empty($_POST['events']) && is_array($_POST['events'])) {
                 foreach ($_POST['events'] as $event_id) {
-                    $event_id = (int)$event_id;
-                    $number_of_guests = $guests;
-                    $event_sql = "INSERT INTO event_booking_tbl 
-                        (tracking_number, event_id, number_of_guests, status) 
-                        VALUES ('$tracking_number', '$event_id', '$number_of_guests', 'Pending')";
-                    mysqli_query($conn, $event_sql);
+                    $eid = (int) $event_id;
+                    mysqli_query($conn, "INSERT INTO event_booking_tbl (tracking_number, event_id, number_of_guests, status) VALUES ('$tracking_number', '$eid', '$guests', 'Pending')");
                 }
             }
 
-            // Services
+            // 4. Services
             if (!empty($_POST['services']) && is_array($_POST['services'])) {
-                foreach ($_POST['services'] as $service_id) {
-                    $service_id = (int)$service_id;
-                    $service_sql = "INSERT INTO reservation_services_tbl (reservation_id, tracking_number, service_id) 
-                                    VALUES ('$reservation_id','$tracking_number','$service_id')";
-                    mysqli_query($conn, $service_sql);
+                foreach ($_POST['services'] as $sid) {
+                    $sid = (int) $sid;
+                    mysqli_query($conn, "INSERT INTO reservation_services_tbl (reservation_id, tracking_number, service_id) VALUES ('$reservation_id','$tracking_number','$sid')");
                 }
             }
 
-            // Boat Rentals
+            // 5. Boat Rentals
             if (!empty($_POST['boat_rentals']) && is_array($_POST['boat_rentals'])) {
                 foreach ($_POST['boat_rentals'] as $boat) {
                     $parts = explode(':', $boat);
-                    $boat_id      = (int)$parts[0];
-                    $include_island = (isset($parts[1]) && $parts[1] == 1) ? 1 : 0;
-                    $amount         = isset($parts[2]) ? (float)$parts[2] : 0;
-
-                    $boat_sql = "INSERT INTO reservation_boat_rentals_tbl 
-                        (reservation_id, tracking_number, rental_id, include_island, amount)
-                        VALUES ('$reservation_id', '$tracking_number', '$boat_id', '$include_island', '$amount')";
-                    mysqli_query($conn, $boat_sql);
+                    $bid = (int) $parts[0];
+                    $island = (int) ($parts[1] ?? 0);
+                    $amt = (float) ($parts[2] ?? 0);
+                    mysqli_query($conn, "INSERT INTO reservation_boat_rentals_tbl (reservation_id, tracking_number, rental_id, include_island, amount) VALUES ('$reservation_id', '$tracking_number', '$bid', '$island', '$amt')");
                 }
             }
 
-            // Rentals
+            // 6. Equipment Rentals
             if (!empty($_POST['rentals']) && is_array($_POST['rentals'])) {
-                foreach ($_POST['rentals'] as $rental_id) {
-                    $rental_id = (int)$rental_id;
-                    $rental_sql = "INSERT INTO reservation_rentals_tbl (reservation_id, tracking_number, rental_id) 
-                                   VALUES ('$reservation_id','$tracking_number','$rental_id')";
-                    mysqli_query($conn, $rental_sql);
+                foreach ($_POST['rentals'] as $rid) {
+                    $rid = (int) $rid;
+                    mysqli_query($conn, "INSERT INTO reservation_rentals_tbl (reservation_id, tracking_number, rental_id) VALUES ('$reservation_id','$tracking_number','$rid')");
                 }
             }
 
-            // Payment
+            // 7. Payment Upload
             if (!empty($_POST['payment_type']) && !empty($_POST['reference_number'])) {
-                $payment_type     = (int)$_POST['payment_type'];
-                $reference_number = mysqli_real_escape_string($conn, $_POST['reference_number']);
-                $payment_option   = mysqli_real_escape_string($conn, $_POST['payment_option'] ?? 'full'); // Get payment option
-                $amount_paid      = isset($_POST['final_payable']) ? (float)$_POST['final_payable'] : $total_price; // Get actual amount paid
-                $screenshot       = null;
+                $pay_type = (int) $_POST['payment_type'];
+                $ref_num = mysqli_real_escape_string($conn, $_POST['reference_number']);
+                $pay_opt = mysqli_real_escape_string($conn, $_POST['payment_option'] ?? 'full');
+                $amt_paid = (float) ($_POST['final_payable'] ?? $total_price);
+                $screenshot = null;
 
                 if (isset($_FILES['payment_screenshot']) && $_FILES['payment_screenshot']['error'] === UPLOAD_ERR_OK) {
-                    $screenshot = basename($_FILES['payment_screenshot']['name']);
-                    $target_dir = __DIR__ . "./uploads/";
-                    if (!file_exists($target_dir)) {
+                    $screenshot = time() . "_" . basename($_FILES['payment_screenshot']['name']);
+                    $target_dir = __DIR__ . "/uploads/";
+                    if (!file_exists($target_dir))
                         mkdir($target_dir, 0777, true);
-                    }
-                    $target_file = $target_dir . $screenshot;
-                    move_uploaded_file($_FILES["payment_screenshot"]["tmp_name"], $target_file);
+                    move_uploaded_file($_FILES["payment_screenshot"]["tmp_name"], $target_dir . $screenshot);
                 }
 
-                // Insert with payment_option
-                $payment_sql = "INSERT INTO reservation_payments_tbl 
-                    (reservation_id, tracking_number, payment_type, reference_number, proof_image, amount, payment_option) 
-                    VALUES ('$reservation_id','$tracking_number','$payment_type','$reference_number','$screenshot','$amount_paid', '$payment_option')";
-                mysqli_query($conn, $payment_sql);
+                mysqli_query($conn, "INSERT INTO reservation_payments_tbl (reservation_id, tracking_number, payment_type, reference_number, proof_image, amount, payment_option) VALUES ('$reservation_id','$tracking_number','$pay_type','$ref_num','$screenshot','$amt_paid', '$pay_opt')");
             }
 
-            // Note: Room availability update logic is usually done after admin confirmation, 
-            // but if you want to deduct immediately, uncomment the line below:
-            // mysqli_query($conn, "UPDATE rooms_tbl SET available = available - 1 WHERE room_id = '" . mysqli_real_escape_string($conn, $room_id) . "'");
+            // --- EMAIL PREPARATION ---
+            $services_list = "<ul>";
+            $s_res = mysqli_query($conn, "SELECT s.service_name FROM reservation_services_tbl rs JOIN services_tbl s ON s.service_id = rs.service_id WHERE rs.reservation_id = '$reservation_id'");
+            while ($r = mysqli_fetch_assoc($s_res))
+                $services_list .= "<li>✔️ " . htmlspecialchars($r['service_name']) . "</li>";
+            $services_list .= "</ul>";
 
-            // Fetch services for email
-            $services_list = "";
-            $services_sql = "SELECT s.service_name 
-                 FROM reservation_services_tbl rs
-                 INNER JOIN services_tbl s ON s.service_id = rs.service_id
-                 WHERE rs.reservation_id = '$reservation_id'";
-            $services_result = mysqli_query($conn, $services_sql);
-            if ($services_result && mysqli_num_rows($services_result) > 0) {
-                $services_list .= "<ul>";
-                while ($row = mysqli_fetch_assoc($services_result)) {
-                    $services_list .= "<li>✔️ " . htmlspecialchars($row['service_name']) . "</li>";
-                }
-                $services_list .= "</ul>";
-            } else {
-                $services_list = "<p><em>No additional services availed</em></p>";
-            }
-
-            // Fetch rentals for email
-            $rentals_list = "";
-            $rentals_sql = "SELECT r.rental_name 
-                FROM reservation_rentals_tbl rr
-                INNER JOIN rentals_tbl r ON r.rental_id = rr.rental_id
-                WHERE rr.reservation_id = '$reservation_id'";
-            $rentals_result = mysqli_query($conn, $rentals_sql);
-            if ($rentals_result && mysqli_num_rows($rentals_result) > 0) {
-                $rentals_list .= "<ul>";
-                while ($row = mysqli_fetch_assoc($rentals_result)) {
-                    $rentals_list .= "<li>🛠️ " . htmlspecialchars($row['rental_name']) . "</li>";
-                }
-                $rentals_list .= "</ul>";
-            } else {
-                $rentals_list = "<p><em>No rentals availed</em></p>";
-            }
-
-            // Determine payment status text for email
-            $payment_status_text = ($payment_option == 'downpayment') ? '50% Downpayment' : 'Full Payment';
-            $balance_amount = $total_price - $amount_paid;
-            $balance_text = ($balance_amount > 0) ? "<tr><td style='padding: 10px;'><span>⚠️ <strong>Balance Due (Upon Arrival)</strong></span></td><td style='padding: 10px; color: #dc3545;'>₱" . number_format($balance_amount, 2) . "</td></tr>" : "";
-
+            $payment_status_text = ($pay_opt == 'downpayment') ? '50% Downpayment' : 'Full Payment';
+            $balance_amount = $total_price - $amt_paid;
+            $balance_text = ($balance_amount > 0) ? "<tr><td style='padding:10px;'><span>⚠️ <strong>Balance Due</strong></span></td><td style='padding:10px; color:#dc3545;'>₱" . number_format($balance_amount, 2) . "</td></tr>" : "";
 
             // Send confirmation email
             $mail = new PHPMailer(true);
@@ -248,75 +183,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $mail->isHTML(true);
                 $mail->Subject = 'Reservation Confirmation';
                 $mail->Body = "
-                    <div style='font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: auto; border: 1px solid #e0e0e0; border-radius: 10px; overflow: hidden;'>
-                        <div style='background: linear-gradient(135deg, #28a745, #20c997); padding: 20px; text-align: center; color: #fff;'>
-                            <h2 style='margin: 0; font-size: 24px;'>✅ Reservation Pending Confirmation</h2>
-                            <p>Your payment proof has been received.</p>
+                    <div style='font-family:Arial,sans-serif; color:#333; max-width:600px; margin:auto; border:1px solid #e0e0e0; border-radius:10px; overflow:hidden;'>
+                        <div style='background:linear-gradient(135deg, #28a745, #20c997); padding:20px; text-align:center; color:#fff;'>
+                            <h2 style='margin:0;'>✅ Reservation Received</h2>
+                            <p>Tracking ID: $tracking_number</p>
                         </div>
-
-                        <div style='padding: 20px;'>
+                        <div style='padding:20px;'>
                             <p>Hi <strong>$guest_name</strong>,</p>
-                            <p>Thank you for booking with us! Your reservation request has been received.</p>
-
-                            <table style='width: 100%; border-collapse: collapse; margin-top: 20px;'>
-                                <tr style='background-color: #f2f2f2;'>
-                                    <td style='padding: 10px;'><span>🆔 <strong>Tracking Number</strong></span></td>
-                                    <td style='padding: 10px; color: #28a745;'><strong>$tracking_number</strong></td>
-                                </tr>
-                                <tr>
-                                    <td style='padding: 10px;'><span>🏨 <strong>Room</strong></span></td>
-                                    <td style='padding: 10px;'>$room_name</td>
-                                </tr>
-                                <tr style='background-color: #f2f2f2;'>
-                                    <td style='padding: 10px;'><span>📅 <strong>Check-in</strong></span></td>
-                                    <td style='padding: 10px;'>$check_in</td>
-                                </tr>
-                                <tr>
-                                    <td style='padding: 10px;'><span>📅 <strong>Check-out</strong></span></td>
-                                    <td style='padding: 10px;'>$check_out</td>
-                                </tr>
-                                <tr style='background-color: #f2f2f2;'>
-                                    <td style='padding: 10px;'><span>💳 <strong>Payment Option</strong></span></td>
-                                    <td style='padding: 10px;'>$payment_status_text</td>
-                                </tr>
-                                <tr>
-                                    <td style='padding: 10px;'><span>💰 <strong>Amount Paid</strong></span></td>
-                                    <td style='padding: 10px;'>₱" . number_format($amount_paid, 2) . "</td>
-                                </tr>
+                            <table style='width:100%; border-collapse:collapse;'>
+                                <tr style='background:#f9f9f9;'><td style='padding:10px;'>🏨 <strong>Room</strong></td><td>$room_name</td></tr>
+                                <tr><td style='padding:10px;'>👥 <strong>Guests</strong></td><td>$guests ($total_male Male, $total_female Female)</td></tr>
+                                <tr style='background:#f9f9f9;'><td style='padding:10px;'>📅 <strong>Check-in</strong></td><td>$check_in</td></tr>
+                                <tr><td style='padding:10px;'>📅 <strong>Check-out</strong></td><td>$check_out</td></tr>
+                                <tr style='background:#f9f9f9;'><td style='padding:10px;'>💰 <strong>Paid</strong></td><td>₱" . number_format($amt_paid, 2) . " ($payment_status_text)</td></tr>
                                 $balance_text
                             </table>
-
-                            <h3 style='margin-top: 30px; color: #20c997;'>🛎️ Services Availed</h3>
-                            $services_list
-
-                            <h3 style='margin-top: 20px; color: #20c997;'>🔧 Rentals Availed</h3>
-                            $rentals_list
-
-                            <p style='margin-top: 20px;'>📍 Please present this tracking number upon arrival.</p>
-                            <p>💌 If you have any questions, feel free to contact us.</p>
-
-                            <p style='margin-top: 30px;'>Thank you!<br><strong>Beach Front Resort</strong></p>
+                            <h3>🛎️ Services</h3> $services_list
+                            <p>Please present your Tracking Number upon arrival. Thank you!</p>
                         </div>
-                    </div>
-                    ";
+                    </div>";
 
                 $mail->send();
-
-                $response = ["status" => "success", "message" => "Reservation successful. Check your email.", "tracking_number" => $tracking_number];
+                $response = ["status" => "success", "message" => "Booking confirmed!", "tracking_number" => $tracking_number];
             } catch (Exception $e) {
-                $response = ["status" => "error", "message" => "Reservation saved but email failed: " . $mail->ErrorInfo];
+                $response = ["status" => "success", "message" => "Saved, but email failed: " . $mail->ErrorInfo];
             }
         } else {
-            $response = ["status" => "error", "message" => "Failed to insert reservation: " . mysqli_error($conn)];
+            $response = ["status" => "error", "message" => "DB Error: " . mysqli_error($conn)];
         }
-    } else {
-        $response = ["status" => "error", "message" => "Invalid number of guests or room not available."];
     }
 }
-
-// Always return JSON
-if (json_last_error() !== JSON_ERROR_NONE) {
-    $response = ["status" => "error", "message" => "JSON encoding failed: " . json_last_error_msg()];
-}
 echo json_encode($response);
-exit; 
+exit;
