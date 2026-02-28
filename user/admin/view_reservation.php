@@ -265,9 +265,7 @@ if (mysqli_num_rows($ev_q) > 0) {
                                         ?>
                                         <h6 class="section-title">Associated Event</h6>
                                         <div class="mb-3">
-                                            <div class="info-label">Booking ID</div>
-                                            <div class="info-value">#<?= $event_booking['event_booking_id'] ?> <a href="event_bookings.php?filter=all#" target="_blank"><i class="fas fa-external-link-alt fa-sm"></i></a></div>
-                                            <div class="info-label">Event Name</div>
+                                           <div class="info-label">Event Name</div>
                                             <div class="info-value"><?= htmlspecialchars($event_booking['event_name']) ?></div>
                                             <div class="info-label">Date</div>
                                             <div class="info-value"><?= date('M d, Y', strtotime($event_booking['event_date'])) ?></div>
@@ -275,8 +273,6 @@ if (mysqli_num_rows($ev_q) > 0) {
                                             <div class="info-value"><?= date('h:i A', strtotime($event_booking['event_time'])) ?><?php if (!empty($event_booking['event_end_time'])) echo ' - '.date('h:i A', strtotime($event_booking['event_end_time'])); ?></div>
                                             <div class="info-label">Guests</div>
                                             <div class="info-value"><span class="badge badge-info"><?= $event_booking['number_of_guests'] ?></span></div>
-                                            <div class="info-label">Status</div>
-                                            <div class="info-value"><span class="badge <?= $evt_badge ?>"><?= htmlspecialchars($event_booking['status']) ?></span></div>
                                         </div>
                                         <hr>
                                     <?php endif; ?>

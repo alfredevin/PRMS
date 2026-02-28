@@ -464,7 +464,8 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0;
                                 <p class="text-muted mb-4">Select events you'd like to attend during your stay:</p>
                                 <div class="row g-3" id="eventsContainer">
                                     <?php
-                                    $events_query = mysqli_query($conn, "SELECT * FROM event_tbl ORDER BY event_date ASC");
+                                    $today = date('Y-m-d');
+                                    $events_query = mysqli_query($conn, "SELECT * FROM event_tbl WHERE event_date >= '$today'ORDER BY event_date ASC");
                                     if (mysqli_num_rows($events_query) > 0) {
                                         while ($event = mysqli_fetch_assoc($events_query)) {
                                             $event_datetime = strtotime($event['event_date'] . ' ' . $event['event_time']);
