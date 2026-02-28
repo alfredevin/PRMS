@@ -12,10 +12,10 @@ $userid = $_SESSION['userid'] ?? null;
 $current_page = basename($_SERVER['PHP_SELF'], '.php');
 
 // Define grouped pages
-$reservation_page = ['newReservation', 'cancelledReservation', 'event', 'checkInCustomer', 'for_cancellation',    'forPaymentReservation', 'reservedCustomer', 'todayReservation', 'reserationHistory', 'view_reservation', 'checkInCustomer', 'reservationHistory'];
+$reservation_page = ['newReservation', 'cancelledReservation', 'event', 'checkInCustomer', 'for_cancellation', 'forPaymentReservation', 'reservedCustomer', 'todayReservation', 'reserationHistory', 'view_reservation', 'checkInCustomer', 'reservationHistory'];
 $request_pages = ['pending_request', 'for_recieve', 'recieved'];
 $maintenance_pages = ['room_type', 'payment_type', 'add_room', 'event_bookings', 'entrance_fee', 'services', 'boat_rental_fee', 'rental', 'equipment', 'discount'];
-$report_page = ['customerLogs', 'incomeReports', 'listOfReservationReport', 'servicesListReport', 'rentalListReport', 'roomListReport'];
+$report_page = ['customerLogs', 'incomeReports', 'listOfReservationReport', 'servicesListReport', 'rentalListReport', 'roomListReport', 'reschedule_report'];
 $inventory_page = ['equipment_inventory', 'borrowed_equipment', 'damaged_equipment', 'all_equipment_status'];
 ?>
 
@@ -118,7 +118,8 @@ $inventory_page = ['equipment_inventory', 'borrowed_equipment', 'damaged_equipme
 
     <a class="sidebar-brand d-flex align-items-center justify-content-center py-3" href="index">
         <div class="sidebar-brand-icon">
-            <img src="uploads/solo_logo.jpg" width="60" height="60" style="border-radius:50%; object-fit: cover;" alt="Logo">
+            <img src="uploads/solo_logo.jpg" width="60" height="60" style="border-radius:50%; object-fit: cover;"
+                alt="Logo">
         </div>
     </a>
 
@@ -152,40 +153,58 @@ $inventory_page = ['equipment_inventory', 'borrowed_equipment', 'damaged_equipme
     <div class="sidebar-heading">Manage</div>
 
     <li class="nav-item <?= in_array($current_page, $reservation_page) ? 'active' : '' ?>">
-        <a class="nav-link <?= in_array($current_page, $reservation_page) ? '' : 'collapsed' ?>" href="#" data-toggle="collapse" data-target="#reservation"
-            aria-expanded="<?= in_array($current_page, $reservation_page) ? 'true' : 'false' ?>" aria-controls="reservation">
+        <a class="nav-link <?= in_array($current_page, $reservation_page) ? '' : 'collapsed' ?>" href="#"
+            data-toggle="collapse" data-target="#reservation"
+            aria-expanded="<?= in_array($current_page, $reservation_page) ? 'true' : 'false' ?>"
+            aria-controls="reservation">
             <i class="fas fa-fw fa-calendar-check"></i>
             <span>Reservation</span>
         </a>
-        <div id="reservation" class="collapse <?= in_array($current_page, $reservation_page) ? 'show' : '' ?>" data-parent="#accordionSidebar">
+        <div id="reservation" class="collapse <?= in_array($current_page, $reservation_page) ? 'show' : '' ?>"
+            data-parent="#accordionSidebar">
             <div class="bg-white py-2 collapse-inner rounded">
                 <h6 class="collapse-header">Booking Actions:</h6>
                 <a class="collapse-item <?= $current_page == 'event' ? 'active' : '' ?>" href="event">Events</a>
-                <a class="collapse-item <?= $current_page == 'newReservation' ? 'active' : '' ?>" href="newReservation">New Reservation</a>
-                <a class="collapse-item <?= $current_page == 'reservedCustomer' ? 'active' : '' ?>" href="reservedCustomer">Approved Customer</a>
-                <a class="collapse-item <?= $current_page == 'todayReservation' ? 'active' : '' ?>" href="todayReservation">Booked Today</a>
-                <a class="collapse-item <?= $current_page == 'resched_booking' ? 'active' : '' ?>" href="resched_booking">Resched Booking</a>
-                <a class="collapse-item <?= $current_page == 'for_cancellation' ? 'active' : '' ?>" href="for_cancellation">For Cancellation</a>
-                <a class="collapse-item <?= $current_page == 'cancelledReservation' ? 'active' : '' ?>" href="cancelledReservation">Cancelled History</a>
-                <a class="collapse-item <?= $current_page == 'checkInCustomer' ? 'active' : '' ?>" href="checkInCustomer">In-House Guests</a>
-                <a class="collapse-item <?= $current_page == 'reservationHistory' ? 'active' : '' ?>" href="reservationHistory">All History</a>
+                <a class="collapse-item <?= $current_page == 'newReservation' ? 'active' : '' ?>"
+                    href="newReservation">New Reservation</a>
+                <a class="collapse-item <?= $current_page == 'reservedCustomer' ? 'active' : '' ?>"
+                    href="reservedCustomer">Approved Customer</a>
+                <a class="collapse-item <?= $current_page == 'todayReservation' ? 'active' : '' ?>"
+                    href="todayReservation">Booked Today</a>
+                <a class="collapse-item <?= $current_page == 'resched_booking' ? 'active' : '' ?>"
+                    href="resched_booking">Resched Booking</a>
+                <a class="collapse-item <?= $current_page == 'for_cancellation' ? 'active' : '' ?>"
+                    href="for_cancellation">For Cancellation</a>
+                <a class="collapse-item <?= $current_page == 'cancelledReservation' ? 'active' : '' ?>"
+                    href="cancelledReservation">Cancelled History</a>
+                <a class="collapse-item <?= $current_page == 'checkInCustomer' ? 'active' : '' ?>"
+                    href="checkInCustomer">In-House Guests</a>
+                <a class="collapse-item <?= $current_page == 'reservationHistory' ? 'active' : '' ?>"
+                    href="reservationHistory">All History</a>
             </div>
         </div>
     </li>
 
     <li class="nav-item <?= in_array($current_page, $inventory_page) ? 'active' : '' ?>">
-        <a class="nav-link <?= in_array($current_page, $inventory_page) ? '' : 'collapsed' ?>" href="#" data-toggle="collapse" data-target="#inventory"
-            aria-expanded="<?= in_array($current_page, $inventory_page) ? 'true' : 'false' ?>" aria-controls="reservation">
+        <a class="nav-link <?= in_array($current_page, $inventory_page) ? '' : 'collapsed' ?>" href="#"
+            data-toggle="collapse" data-target="#inventory"
+            aria-expanded="<?= in_array($current_page, $inventory_page) ? 'true' : 'false' ?>"
+            aria-controls="reservation">
             <i class="fas fa-fw fa-boxes"></i>
             <span>Inventory</span>
         </a>
-        <div id="inventory" class="collapse <?= in_array($current_page, $inventory_page) ? 'show' : '' ?>" data-parent="#accordionSidebar">
+        <div id="inventory" class="collapse <?= in_array($current_page, $inventory_page) ? 'show' : '' ?>"
+            data-parent="#accordionSidebar">
             <div class="bg-white py-2 collapse-inner rounded">
                 <h6 class="collapse-header">Equipment Status:</h6>
-                <a class="collapse-item <?= $current_page == 'equipment_inventory' ? 'active' : '' ?>" href="equipment_inventory">Master List</a>
-                <a class="collapse-item <?= $current_page == 'borrowed_equipment' ? 'active' : '' ?>" href="borrowed_equipment">Borrowed</a>
-                <a class="collapse-item <?= $current_page == 'damaged_equipment' ? 'active' : '' ?>" href="damaged_equipment">Damaged</a>
-                <a class="collapse-item <?= $current_page == 'all_equipment_status' ? 'active' : '' ?>" href="all_equipment_status">Overview Status</a>
+                <a class="collapse-item <?= $current_page == 'equipment_inventory' ? 'active' : '' ?>"
+                    href="equipment_inventory">Master List</a>
+                <a class="collapse-item <?= $current_page == 'borrowed_equipment' ? 'active' : '' ?>"
+                    href="borrowed_equipment">Borrowed</a>
+                <a class="collapse-item <?= $current_page == 'damaged_equipment' ? 'active' : '' ?>"
+                    href="damaged_equipment">Damaged</a>
+                <a class="collapse-item <?= $current_page == 'all_equipment_status' ? 'active' : '' ?>"
+                    href="all_equipment_status">Overview Status</a>
             </div>
         </div>
     </li>
@@ -196,18 +215,26 @@ $inventory_page = ['equipment_inventory', 'borrowed_equipment', 'damaged_equipme
     <div class="sidebar-heading">Analytics</div>
 
     <li class="nav-item <?= in_array($current_page, $report_page) ? 'active' : '' ?>">
-        <a class="nav-link <?= in_array($current_page, $report_page) ? '' : 'collapsed' ?>" href="#" data-toggle="collapse" data-target="#reports"
+        <a class="nav-link <?= in_array($current_page, $report_page) ? '' : 'collapsed' ?>" href="#"
+            data-toggle="collapse" data-target="#reports"
             aria-expanded="<?= in_array($current_page, $report_page) ? 'true' : 'false' ?>" aria-controls="reports">
             <i class="fas fa-fw fa-chart-line"></i>
             <span>Reports</span>
         </a>
-        <div id="reports" class="collapse <?= in_array($current_page, $report_page) ? 'show' : '' ?>" data-parent="#accordionSidebar">
+        <div id="reports" class="collapse <?= in_array($current_page, $report_page) ? 'show' : '' ?>"
+            data-parent="#accordionSidebar">
             <div class="bg-white py-2 collapse-inner rounded">
                 <h6 class="collapse-header">Generate Reports:</h6>
-                <a class="collapse-item <?= $current_page == 'customerLogs' ? 'active' : '' ?>" href="customerLogs">Customer Logs</a>
-                <a class="collapse-item <?= $current_page == 'incomeReports' ? 'active' : '' ?>" href="incomeReports">Income Report</a>
-                <a class="collapse-item <?= $current_page == 'listOfReservationReport' ? 'active' : '' ?>" href="listOfReservationReport">Reservation List</a>
-                <a class="collapse-item <?= $current_page == 'roomListReport' ? 'active' : '' ?>" href="roomListReport">Room List</a>
+                <a class="collapse-item <?= $current_page == 'customerLogs' ? 'active' : '' ?>"
+                    href="customerLogs">Customer Logs</a>
+                <a class="collapse-item <?= $current_page == 'incomeReports' ? 'active' : '' ?>"
+                    href="incomeReports">Income Report</a>
+                <a class="collapse-item <?= $current_page == 'listOfReservationReport' ? 'active' : '' ?>"
+                    href="listOfReservationReport">Reservation List Report</a>
+                <a class="collapse-item <?= $current_page == 'reschedule_report' ? 'active' : '' ?>"
+                    href="reschedule_report">Reschedule List Report</a>
+                <a class="collapse-item <?= $current_page == 'roomListReport' ? 'active' : '' ?>"
+                    href="roomListReport">Room List</a>
             </div>
         </div>
     </li>
@@ -218,25 +245,35 @@ $inventory_page = ['equipment_inventory', 'borrowed_equipment', 'damaged_equipme
     <div class="sidebar-heading">Settings</div>
 
     <li class="nav-item <?= in_array($current_page, $maintenance_pages) ? 'active' : '' ?>">
-        <a class="nav-link <?= in_array($current_page, $maintenance_pages) ? '' : 'collapsed' ?>" href="#" data-toggle="collapse" data-target="#maintenance"
-            aria-expanded="<?= in_array($current_page, $maintenance_pages) ? 'true' : 'false' ?>" aria-controls="maintenance">
+        <a class="nav-link <?= in_array($current_page, $maintenance_pages) ? '' : 'collapsed' ?>" href="#"
+            data-toggle="collapse" data-target="#maintenance"
+            aria-expanded="<?= in_array($current_page, $maintenance_pages) ? 'true' : 'false' ?>"
+            aria-controls="maintenance">
             <i class="fas fa-fw fa-cogs"></i>
             <span>Maintenance</span>
         </a>
-        <div id="maintenance" class="collapse <?= in_array($current_page, $maintenance_pages) ? 'show' : '' ?>" data-parent="#accordionSidebar">
+        <div id="maintenance" class="collapse <?= in_array($current_page, $maintenance_pages) ? 'show' : '' ?>"
+            data-parent="#accordionSidebar">
             <div class="bg-white py-2 collapse-inner rounded">
                 <h6 class="collapse-header">System Setup:</h6>
-                <a class="collapse-item <?= $current_page == 'add_room' ? 'active' : '' ?>" href="add_room">Manage Rooms</a>
-                <a class="collapse-item <?= $current_page == 'room_type' ? 'active' : '' ?>" href="room_type">Room Types</a>
-                <a class="collapse-item <?= $current_page == 'payment_type' ? 'active' : '' ?>" href="payment_type">Payment Types</a>
+                <a class="collapse-item <?= $current_page == 'add_room' ? 'active' : '' ?>" href="add_room">Manage
+                    Rooms</a>
+                <a class="collapse-item <?= $current_page == 'room_type' ? 'active' : '' ?>" href="room_type">Room
+                    Types</a>
+                <a class="collapse-item <?= $current_page == 'payment_type' ? 'active' : '' ?>"
+                    href="payment_type">Payment Types</a>
                 <a class="collapse-item <?= $current_page == 'services' ? 'active' : '' ?>" href="services">Services</a>
                 <a class="collapse-item <?= $current_page == 'rental' ? 'active' : '' ?>" href="rental">Rentals</a>
-                <a class="collapse-item <?= $current_page == 'boat_rental_fee' ? 'active' : '' ?>" href="boat_rental_fee">Boat Fees</a>
-                <a class="collapse-item <?= $current_page == 'equipment' ? 'active' : '' ?>" href="equipment">Equipment</a>
+                <a class="collapse-item <?= $current_page == 'boat_rental_fee' ? 'active' : '' ?>"
+                    href="boat_rental_fee">Boat Fees</a>
+                <a class="collapse-item <?= $current_page == 'equipment' ? 'active' : '' ?>"
+                    href="equipment">Equipment</a>
                 <!-- <a class="collapse-item <?= $current_page == 'event' ? 'active' : '' ?>" href="event">Events</a> -->
                 <!-- <a class="collapse-item <?= $current_page == 'event_bookings' ? 'active' : '' ?>" href="event_bookings">Event Bookings</a> -->
-                <a class="collapse-item <?= $current_page == 'entrance_fee' ? 'active' : '' ?>" href="entrance_fee">Entrance Fees</a>
-                <a class="collapse-item <?= $current_page == 'discount' ? 'active' : '' ?>" href="discount">Promos / Discounts</a>
+                <a class="collapse-item <?= $current_page == 'entrance_fee' ? 'active' : '' ?>"
+                    href="entrance_fee">Entrance Fees</a>
+                <a class="collapse-item <?= $current_page == 'discount' ? 'active' : '' ?>" href="discount">Promos /
+                    Discounts</a>
             </div>
         </div>
     </li>
@@ -250,7 +287,7 @@ $inventory_page = ['equipment_inventory', 'borrowed_equipment', 'damaged_equipme
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-    document.getElementById('signOutLink')?.addEventListener('click', function(event) {
+    document.getElementById('signOutLink')?.addEventListener('click', function (event) {
         event.preventDefault();
         Swal.fire({
             title: 'Are you sure?',

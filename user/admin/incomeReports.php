@@ -184,9 +184,11 @@ function formatCurrency($amount)
                                             <td colspan="2" class="text-right font-weight-bold text-uppercase">Total for
                                                 this Period:</td>
                                             <td class="text-right font-weight-bold text-success h5">
-                                                <?= formatCurrency($grand_total_income) ?></td>
+                                                <?= formatCurrency($grand_total_income) ?>
+                                            </td>
                                             <td class="text-right text-danger d-print-none font-weight-bold">
-                                                <?= formatCurrency($grand_total_balance) ?></td>
+                                                <?= formatCurrency($grand_total_balance) ?>
+                                            </td>
                                         </tr>
                                     </tfoot>
                                 </table>

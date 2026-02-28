@@ -1,11 +1,11 @@
 <?php
 include '../../../config.php';
 
-// Get Filters
+// 1. GET FILTERS
 $from_date = isset($_GET['from_date']) ? $_GET['from_date'] : date('Y-m-d');
 $to_date = isset($_GET['to_date']) ? $_GET['to_date'] : date('Y-m-d');
 
-// Fetch Data
+// 2. FETCH DATA
 $sql = "SELECT r.*, rm.room_name, rt.room_type_name
         FROM reservation_tbl r
         JOIN rooms_tbl rm ON r.room_id = rm.room_id
@@ -16,126 +16,170 @@ $sql = "SELECT r.*, rm.room_name, rt.room_type_name
 $result = mysqli_query($conn, $sql);
 
 $current_date = date('F d, Y');
-$total_guests = 0;
+
+// Stats counters initialization
+$total_pax = 0;
+$total_males = 0;
+$total_females = 0;
+$total_local = 0;
+$total_foreign = 0;
 ?>
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Guest Manifest Report</title>
+    <title>Official Guest Manifest - Tourism Report</title>
     <style>
         @media print {
             @page {
                 margin: 10mm;
                 size: A4 landscape;
-                /* Landscape usually better for guest lists */
             }
 
             body {
                 margin: 0;
                 padding: 0;
-                -webkit-print-color-adjust: exact;
+                background-color: white;
             }
 
             .no-print {
-                display: none;
+                display: none !important;
             }
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', Arial, sans-serif;
             font-size: 10pt;
-            color: #333;
-            background-color: white;
+            color: #000;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
         }
 
         .container {
             width: 100%;
-            margin: 0 auto;
-            padding: 10px;
+            max-width: 1100px;
+            margin: auto;
+            background: white;
+            padding: 30px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
 
-        /* Header */
-        .header {
-            text-align: center;
+        /* --- COMPACT OFFICIAL HEADER --- */
+        .header-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            /* Pinaglalapit ang mga elements */
+            border-bottom: 2px solid #333;
+            padding-bottom: 15px;
             margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 3px double #36b9cc;
-            /* Info Blue */
+            gap: 30px;
+            /* Distansya ng logo sa text */
         }
 
-        .header img {
-            width: 70px;
+        .header-logo {
+            width: 90px;
             height: auto;
-            margin-bottom: 5px;
         }
 
-        .header h2 {
+        .header-text {
+            text-align: center;
+            line-height: 1.2;
+        }
+
+        .header-text h5 {
             margin: 0;
-            color: #36b9cc;
+            font-size: 10pt;
+            font-weight: normal;
             text-transform: uppercase;
-            font-size: 16pt;
         }
 
-        .header p {
-            margin: 2px 0;
+        .header-text h4 {
+            margin: 0;
+            font-size: 11pt;
+            font-weight: bold;
+        }
+
+        .header-text h2 {
+            margin: 5px 0;
+            font-size: 18pt;
+            color: #1a5276;
+            font-weight: 800;
+        }
+
+        .header-text p {
+            margin: 0;
             font-size: 9pt;
+            color: #555;
         }
 
-        /* Report Details */
-        .report-info {
-            margin-bottom: 15px;
+        /* Stats Section */
+        .stats-row {
             display: flex;
             justify-content: space-between;
-            background-color: #f8f9fc;
-            padding: 10px;
-            border: 1px solid #e3e6f0;
-            border-radius: 5px;
+            margin-bottom: 20px;
+            gap: 10px;
         }
 
-        /* Table Styling */
+        .stat-card {
+            flex: 1;
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+            border-radius: 5px;
+            background: #fcfcfc;
+        }
+
+        .stat-card h3 {
+            margin: 0;
+            color: #d9534f;
+            font-size: 14pt;
+        }
+
+        .stat-card small {
+            font-weight: bold;
+            text-transform: uppercase;
+            color: #666;
+            font-size: 7.5pt;
+        }
+
+        /* Table Style */
         table {
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 20px;
-            font-size: 9pt;
-        }
-
-        th,
-        td {
-            border: 1px solid #ddd;
-            padding: 6px 8px;
-            text-align: left;
         }
 
         th {
-            background-color: #36b9cc;
-            color: white;
-            font-weight: bold;
+            background-color: #f2f2f2;
+            border: 1px solid #333;
+            padding: 10px;
+            font-size: 8pt;
             text-transform: uppercase;
-            font-size: 9pt;
+            color: #333;
         }
 
-        tr:nth-child(even) {
-            background-color: #f2f2f2;
+        td {
+            border: 1px solid #333;
+            padding: 8px;
+            font-size: 9pt;
         }
 
         .text-center {
             text-align: center;
         }
 
-        .text-right {
-            text-align: right;
+        .font-bold {
+            font-weight: bold;
         }
 
         /* Signatures */
         .signatures {
-            margin-top: 40px;
+            margin-top: 50px;
             display: flex;
             justify-content: space-between;
-            page-break-inside: avoid;
         }
 
         .sig-box {
@@ -144,34 +188,24 @@ $total_guests = 0;
         }
 
         .sig-line {
-            border-top: 1px solid #000;
+            border-top: 1.5px solid #000;
             margin-top: 40px;
             margin-bottom: 5px;
         }
 
-        .footer {
-            margin-top: 30px;
-            text-align: center;
-            font-size: 8pt;
-            color: #888;
-            border-top: 1px solid #eee;
-            padding-top: 5px;
-        }
-
         .print-btn {
-            background-color: #36b9cc;
+            background-color: #1a5276;
             color: white;
+            padding: 12px 25px;
             border: none;
-            padding: 10px 20px;
             border-radius: 5px;
             cursor: pointer;
-            font-size: 10pt;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            font-weight: bold;
+            transition: 0.3s;
         }
 
         .print-btn:hover {
-            background-color: #2c9faf;
+            background-color: #154360;
         }
     </style>
 </head>
@@ -179,103 +213,127 @@ $total_guests = 0;
 <body>
 
     <div class="container">
-        <div style="text-align: center;" class="no-print">
-            <button onclick="window.print()" class="print-btn">🖨️ Print Official Guest Manifest</button>
+        <div class="no-print" style="text-align: right; margin-bottom: 20px;">
+            <button onclick="window.print()" class="print-btn">🖨️ PRINT OFFICIAL MANIFEST</button>
         </div>
 
-        <div class="header">
-            <img src="../../uploads/solo_logo.jpg" alt="Resort Logo" onerror="this.style.display='none'"><br>
-            <h2>BEACHFRONT RESORT</h2>
-            <p>Polo, Santa Cruz Marinduque</p>
-            <p><strong>OFFICIAL GUEST MANIFEST REPORT</strong></p>
-        </div>
+        <div class="header-container">
+            <img src="https://www.caap.gov.ph/wp-content/uploads/2023/09/Bagong-Pilipinas-logo.jpg" class="header-logo"
+                alt="LGU Logo">
 
-        <div class="report-info">
-            <div>
-                <strong>Report Date:</strong> <?= $current_date ?><br>
-                <strong>Submited To:</strong> Tourism Department / LGU
+            <div class="header-text">
+                <h5>Republic of the Philippines</h5>
+                <h4>Province of Marinduque</h4>
+                <h4>Municipality of Santa Cruz</h4>
+                <h2>BEACHFRONT RESORT</h2>
+                <p>Brgy. Polo, Santa Cruz, Marinduque | Phone: 0912-345-6789</p>
+                <p style="font-weight: bold; text-decoration: underline; margin-top: 10px;">GUEST MANIFEST & ARRIVAL
+                    REPORT</p>
             </div>
-            <div style="text-align: right;">
-                <strong>Period Covered:</strong><br>
-                <?= date("F d, Y", strtotime($from_date)) ?> — <?= date("F d, Y", strtotime($to_date)) ?>
+
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTPykbqxRcYVOaHJdCDE7_AMuStfLWfA5FznA&s"
+                class="header-logo" alt="Resort Logo">
+        </div>
+
+        <div style="margin-bottom: 15px; font-size: 9pt;">
+            <strong>Generated:</strong> <?= $current_date ?> |
+            <strong>Covered Period:</strong> <?= date("M d, Y", strtotime($from_date)) ?> to
+            <?= date("M d, Y", strtotime($to_date)) ?>
+        </div>
+
+        <div class="stats-row">
+            <div class="stat-card"><small>Total Pax</small>
+                <h3 id="s_pax">0</h3>
+            </div>
+            <div class="stat-card"><small>Males</small>
+                <h3 id="s_m">0</h3>
+            </div>
+            <div class="stat-card"><small>Females</small>
+                <h3 id="s_f">0</h3>
+            </div>
+            <div class="stat-card"><small>Local Tourists</small>
+                <h3 id="s_l">0</h3>
+            </div>
+            <div class="stat-card"><small>Foreign Tourists</small>
+                <h3 id="s_fr">0</h3>
             </div>
         </div>
 
         <table>
             <thead>
                 <tr>
-                    <th width="12%">Check-In</th>
-                    <th width="12%">Check-Out</th>
-                    <th width="25%">Guest Name</th>
-                    <th width="10%">Age/Sex</th>
-                    <th width="15%">Origin/Address</th>
-                    <th width="15%">Room No.</th>
-                    <th width="5%" class="text-center">Pax</th>
-                    <th width="6%" class="text-center">Remarks</th>
+                    <th>#</th>
+                    <th>Arrival</th>
+                    <th>Guest Name</th>
+                    <th>Demographics</th>
+                    <th>Type</th>
+                    <th>Room</th>
+                    <th>Pax</th>
+                    <th>Status</th>
                 </tr>
             </thead>
             <tbody>
                 <?php
+                $count = 1;
                 if (mysqli_num_rows($result) > 0) {
                     while ($row = mysqli_fetch_assoc($result)) {
-                        $total_guests += $row['guests'];
-                        $checkIn = date("m/d/Y", strtotime($row['check_in']));
-                        $checkOut = date("m/d/Y", strtotime($row['check_out']));
+                        $total_pax += $row['guests'];
+                        $total_males += $row['total_male'];
+                        $total_females += $row['total_female'];
 
-                        // Placeholder for data not in main table, usually required by Tourism
-                        $origin = "N/A";
-                        $demographics = "N/A";
-                        $status = ($row['status'] == 4) ? "Out" : "In-House";
-
-                        echo "<tr>
-                                <td>{$checkIn}</td>
-                                <td>{$checkOut}</td>
-                                <td style='font-weight:bold;'>{$row['guest_name']}</td>
-                                <td>{$demographics}</td>
-                                <td>{$origin}</td>
-                                <td>{$row['room_name']}</td>
-                                <td class='text-center'>{$row['guests']}</td>
-                                <td class='text-center'>{$status}</td>
-                              </tr>";
+                        $t_type = $row['tourist_type'] ?? 'Local';
+                        if ($t_type == 'Local')
+                            $total_local++;
+                        else
+                            $total_foreign++;
+                        ?>
+                        <tr class="text-center">
+                            <td><?= $count++ ?></td>
+                            <td><?= date("m/d/Y", strtotime($row['check_in'])) ?></td>
+                            <td class="text-left font-bold" style="text-align: left;"><?= strtoupper($row['guest_name']) ?></td>
+                            <td>M: <?= $row['total_male'] ?> | F: <?= $row['total_female'] ?></td>
+                            <td><?= $t_type ?></td>
+                            <td><?= $row['room_name'] ?></td>
+                            <td class="font-bold"><?= $row['guests'] ?></td>
+                            <td><small><?= ($row['status'] == 4) ? 'Checked-Out' : 'Active' ?></small></td>
+                        </tr>
+                        <?php
                     }
                 } else {
-                    echo "<tr><td colspan='8' style='text-align:center; padding: 20px; font-style:italic;'>No guest arrivals recorded for this period.</td></tr>";
+                    echo "<tr><td colspan='8' class='text-center py-4'>No records found.</td></tr>";
                 }
                 ?>
             </tbody>
-            <tfoot>
-                <tr>
-                    <td colspan="6" class="text-right" style="font-weight:bold; background-color:#e6fcff;">TOTAL NUMBER OF GUESTS:</td>
-                    <td class="text-center" style="font-weight:bold; background-color:#e6fcff; font-size:11pt;"><?= $total_guests ?></td>
-                    <td style="background-color:#e6fcff;"></td>
-                </tr>
-            </tfoot>
         </table>
 
-        <br>
         <div class="signatures">
             <div class="sig-box">
                 <div class="sig-line"></div>
-                <strong>Prepared By</strong><br>
-                <span style="font-size:9pt;">Resort Administrator</span>
+                <strong>Prepared By:</strong><br><small>Front Desk / Staff</small>
             </div>
             <div class="sig-box">
                 <div class="sig-line"></div>
-                <strong>Noted By</strong><br>
-                <span style="font-size:9pt;">Tourism Officer</span>
+                <strong>Noted By:</strong><br><small>Municipal Tourism Officer</small>
             </div>
             <div class="sig-box">
                 <div class="sig-line"></div>
-                <strong>Approved By</strong><br>
-                <span style="font-size:9pt;">Resort Manager</span>
+                <strong>Approved By:</strong><br><small>Resort Manager / Owner</small>
             </div>
         </div>
 
-        <div class="footer">
-            <p>This report serves as an official record for Tourism Statistics and LGU compliance.</p>
-            <p>System Generated Report - BeachFront Resort Management System</p>
+        <div
+            style="margin-top: 30px; text-align: center; font-size: 8pt; color: #999; border-top: 1px solid #eee; padding-top: 10px;">
+            This report is a system-generated document for Beachfront Resort Tourism Compliance.
         </div>
     </div>
+
+    <script>
+        document.getElementById('s_pax').innerText = '<?= $total_pax ?>';
+        document.getElementById('s_m').innerText = '<?= $total_males ?>';
+        document.getElementById('s_f').innerText = '<?= $total_females ?>';
+        document.getElementById('s_l').innerText = '<?= $total_local ?> Groups';
+        document.getElementById('s_fr').innerText = '<?= $total_foreign ?> Groups';
+    </script>
 
 </body>
 
