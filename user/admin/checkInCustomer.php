@@ -30,11 +30,13 @@ $equipment_list = mysqli_fetch_all($equipment_list_res, MYSQLI_ASSOC);
 
                     <div class="card shadow mb-4">
                         <div class="card-header py-3">
-                            <h6 class="m-0 font-weight-bold text-primary"><i class="fas fa-bed"></i> Current Stay List</h6>
+                            <h6 class="m-0 font-weight-bold text-primary"><i class="fas fa-bed"></i> Current Stay List
+                            </h6>
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">
-                                <table class="table table-bordered table-striped" id="dataTable" width="100%" cellspacing="0">
+                                <table class="table table-bordered table-striped" id="dataTable" width="100%"
+                                    cellspacing="0">
                                     <thead>
                                         <tr>
                                             <th>#</th>
@@ -72,12 +74,13 @@ $equipment_list = mysqli_fetch_all($equipment_list_res, MYSQLI_ASSOC);
 
                                             $isTodayCheckout = (date("Y-m-d", strtotime($res['check_out'])) == $today);
                                             $balance_class = ($balance > 0) ? 'text-danger fw-bold' : 'text-success';
-                                        ?>
+                                            ?>
                                             <tr>
                                                 <td><?= $counter++; ?></td>
                                                 <td>
                                                     <?php if ($isTodayCheckout): ?>
-                                                        <span class="badge badge-danger"><i class="fas fa-exclamation-triangle"></i> Due Today</span>
+                                                        <span class="badge badge-danger"><i
+                                                                class="fas fa-exclamation-triangle"></i> Due Today</span>
                                                     <?php else: ?>
                                                         <span class="badge badge-success">Stay-in</span>
                                                     <?php endif; ?>
@@ -86,7 +89,8 @@ $equipment_list = mysqli_fetch_all($equipment_list_res, MYSQLI_ASSOC);
                                                 <td><?= htmlspecialchars($res['guest_name']) ?></td>
                                                 <td>
                                                     <?= htmlspecialchars($res['room_name']) ?> <br>
-                                                    <small class="text-muted">₱<?= number_format($res['room_rate'], 2) ?>/night</small>
+                                                    <small
+                                                        class="text-muted">₱<?= number_format($res['room_rate'], 2) ?>/night</small>
                                                 </td>
                                                 <td><?= $checkIn ?> to <?= $checkOut ?></td>
                                                 <td class="<?= $balance_class ?>">
@@ -94,12 +98,16 @@ $equipment_list = mysqli_fetch_all($equipment_list_res, MYSQLI_ASSOC);
                                                 </td>
                                                 <td>
                                                     <div class="btn-group" role="group">
+                                                        <a href="view_reservation?tracking=<?= $res['tracking_number'] ?>"
+                                                            class="btn btn-primary btn-sm"> Details</a>
+
                                                         <!-- View Loans Button (NEW) -->
-                                                        <button type="button" class="btn btn-secondary btn-sm view-loans-btn"
+                                                        <button type="button"
+                                                            class="btn btn-secondary btn-sm view-loans-btn"
                                                             data-id="<?= $res['reservation_id'] ?>"
                                                             data-name="<?= htmlspecialchars($res['guest_name']) ?>"
                                                             data-balance="<?= $balance ?>">
-                                                            <i class="fas fa-list-alt"></i> View Loans
+                                                            <i class="fas fa-list-alt"></i>  Loans
                                                         </button>
 
                                                         <button type="button" class="btn btn-info btn-sm manage-btn"
@@ -119,7 +127,8 @@ $equipment_list = mysqli_fetch_all($equipment_list_res, MYSQLI_ASSOC);
                                                             <i class="fas fa-tools"></i> Loan Item
                                                         </button>
 
-                                                        <button class="btn btn-danger btn-sm checkout-btn" data-id="<?= $res['reservation_id'] ?>">
+                                                        <button class="btn btn-danger btn-sm checkout-btn"
+                                                            data-id="<?= $res['reservation_id'] ?>">
                                                             <i class="fas fa-sign-out-alt"></i> Out
                                                         </button>
                                                     </div>
@@ -198,7 +207,8 @@ $equipment_list = mysqli_fetch_all($equipment_list_res, MYSQLI_ASSOC);
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title"><i class="fas fa-tools"></i> Equipment Loan for <span id="loan_guest_name" class="font-weight-bold"></span></h5>
+                    <h5 class="modal-title"><i class="fas fa-tools"></i> Equipment Loan for <span id="loan_guest_name"
+                            class="font-weight-bold"></span></h5>
                     <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
                 </div>
                 <form id="loanEquipmentForm">
@@ -226,23 +236,24 @@ $equipment_list = mysqli_fetch_all($equipment_list_res, MYSQLI_ASSOC);
                                 <tbody id="equipmentTableBody">
                                     <?php if (empty($equipment_list)): ?>
                                         <tr>
-                                            <td colspan="4" class="text-center text-muted">No equipment currently in inventory.</td>
+                                            <td colspan="4" class="text-center text-muted">No equipment currently in
+                                                inventory.</td>
                                         </tr>
                                     <?php else: ?>
                                         <?php foreach ($equipment_list as $eq):
                                             $price_val = floatval($eq['equipment_price'] ?? 0.00);
-                                        ?>
+                                            ?>
                                             <tr>
                                                 <td><?= htmlspecialchars($eq['equipment_name']) ?></td>
                                                 <td class="text-center">₱<?= number_format($price_val, 2) ?></td>
-                                                <td class="text-center"><span class="badge badge-primary"><?= $eq['equipment_quantity'] ?></span></td>
+                                                <td class="text-center"><span
+                                                        class="badge badge-primary"><?= $eq['equipment_quantity'] ?></span></td>
                                                 <td class="text-center">
-                                                    <input type="number"
-                                                        name="equipment_loan[<?= $eq['equipment_id'] ?>]"
+                                                    <input type="number" name="equipment_loan[<?= $eq['equipment_id'] ?>]"
                                                         data-price="<?= $price_val ?>"
                                                         data-max="<?= $eq['equipment_quantity'] ?>"
-                                                        class="form-control form-control-sm equipment-qty-input"
-                                                        value="0" min="0" max="<?= $eq['equipment_quantity'] ?>"
+                                                        class="form-control form-control-sm equipment-qty-input" value="0"
+                                                        min="0" max="<?= $eq['equipment_quantity'] ?>"
                                                         style="width: 80px; display: inline-block;">
                                                 </td>
                                             </tr>
@@ -279,7 +290,8 @@ $equipment_list = mysqli_fetch_all($equipment_list_res, MYSQLI_ASSOC);
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header bg-secondary text-white">
-                    <h5 class="modal-title"><i class="fas fa-clipboard-list"></i> Loan History for <span id="history_guest_name" class="font-weight-bold"></span></h5>
+                    <h5 class="modal-title"><i class="fas fa-clipboard-list"></i> Loan History for <span
+                            id="history_guest_name" class="font-weight-bold"></span></h5>
                     <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
                 </div>
                 <div class="modal-body">
@@ -336,7 +348,7 @@ $equipment_list = mysqli_fetch_all($equipment_list_res, MYSQLI_ASSOC);
 
         // --- 1. MANAGE STAY MODAL LOGIC (Existing logic updated for clarity) ---
 
-        $('.manage-btn').on('click', function() {
+        $('.manage-btn').on('click', function () {
             const id = $(this).data('id');
             const checkout = $(this).data('checkout');
             const rate = parseFloat($(this).data('rate'));
@@ -364,7 +376,7 @@ $equipment_list = mysqli_fetch_all($equipment_list_res, MYSQLI_ASSOC);
         });
 
         // 2. Calculate Cost on Date Change (Stay Modal)
-        $('#new_checkout').on('change', function() {
+        $('#new_checkout').on('change', function () {
             const oldDate = new Date($('#current_checkout').val());
             const newDate = new Date($(this).val());
             const rate = parseFloat($('#room_rate').val());
@@ -388,7 +400,7 @@ $equipment_list = mysqli_fetch_all($equipment_list_res, MYSQLI_ASSOC);
         });
 
         // 3. Submit Extension (Existing)
-        $('#extendForm').on('submit', function(e) {
+        $('#extendForm').on('submit', function (e) {
             e.preventDefault();
 
             Swal.fire({
@@ -406,14 +418,14 @@ $equipment_list = mysqli_fetch_all($equipment_list_res, MYSQLI_ASSOC);
                         type: 'POST',
                         data: formData,
                         dataType: 'json',
-                        success: function(response) {
+                        success: function (response) {
                             if (response.status === 'success') {
                                 Swal.fire('Success', response.message, 'success').then(() => location.reload());
                             } else {
                                 Swal.fire('Error', response.message, 'error');
                             }
                         },
-                        error: function() {
+                        error: function () {
                             Swal.fire('Error', 'Server error occurred during extension processing.', 'error');
                         }
                     });
@@ -425,7 +437,7 @@ $equipment_list = mysqli_fetch_all($equipment_list_res, MYSQLI_ASSOC);
 
         let loan_initial_balance = 0;
 
-        $('.loan-btn').on('click', function() {
+        $('.loan-btn').on('click', function () {
             const id = $(this).data('id');
             const name = $(this).data('name');
             const balance = parseFloat($(this).data('balance'));
@@ -448,7 +460,7 @@ $equipment_list = mysqli_fetch_all($equipment_list_res, MYSQLI_ASSOC);
         function calculateLoanCost() {
             let totalLoanCost = 0;
 
-            $('.equipment-qty-input').each(function() {
+            $('.equipment-qty-input').each(function () {
                 const qty = parseInt($(this).val()) || 0;
                 const price = parseFloat($(this).data('price'));
                 const max_qty = parseInt($(this).data('max'));
@@ -487,7 +499,7 @@ $equipment_list = mysqli_fetch_all($equipment_list_res, MYSQLI_ASSOC);
         $('#loanEquipmentModal').on('input', '.equipment-qty-input', calculateLoanCost);
 
         // 5. Submit Loan Equipment Form
-        $('#loanEquipmentForm').on('submit', function(e) {
+        $('#loanEquipmentForm').on('submit', function (e) {
             e.preventDefault();
 
             const totalLoanCost = parseFloat($('#loan_total_cost').val());
@@ -512,14 +524,14 @@ $equipment_list = mysqli_fetch_all($equipment_list_res, MYSQLI_ASSOC);
                         type: 'POST',
                         data: formData,
                         dataType: 'json',
-                        success: function(response) {
+                        success: function (response) {
                             if (response.status === 'success') {
                                 Swal.fire('Success', response.message, 'success').then(() => location.reload());
                             } else {
                                 Swal.fire('Error', response.message, 'error');
                             }
                         },
-                        error: function(jqXHR, textStatus, errorThrown) {
+                        error: function (jqXHR, textStatus, errorThrown) {
                             console.error("AJAX Error:", textStatus, errorThrown, jqXHR.responseText);
                             Swal.fire('Error', 'Server error occurred during loan processing. (Check network tab)', 'error');
                         }
@@ -529,7 +541,7 @@ $equipment_list = mysqli_fetch_all($equipment_list_res, MYSQLI_ASSOC);
         });
 
         // --- 6. LOAN HISTORY LOGIC (NEW) ---
-        $('.view-loans-btn').on('click', function() {
+        $('.view-loans-btn').on('click', function () {
             const reservationId = $(this).data('id');
             const guestName = $(this).data('name');
 
@@ -544,7 +556,7 @@ $equipment_list = mysqli_fetch_all($equipment_list_res, MYSQLI_ASSOC);
                     reservation_id: reservationId
                 },
                 dataType: 'json',
-                success: function(response) {
+                success: function (response) {
                     let tableRows = '';
                     if (response.status === 'success' && response.data.length > 0) {
                         response.data.forEach(item => {
@@ -565,7 +577,7 @@ $equipment_list = mysqli_fetch_all($equipment_list_res, MYSQLI_ASSOC);
                     }
                     $('#loanHistoryTableBody').html(tableRows);
                 },
-                error: function() {
+                error: function () {
                     $('#loanHistoryTableBody').html('<tr><td colspan="6" class="text-center text-danger">Failed to load loan history.</td></tr>');
                 }
             });
@@ -573,7 +585,7 @@ $equipment_list = mysqli_fetch_all($equipment_list_res, MYSQLI_ASSOC);
 
 
         // 7. Checkout Logic (Existing, unchanged)
-        $('.checkout-btn').on('click', function() {
+        $('.checkout-btn').on('click', function () {
             const id = $(this).data('id');
             Swal.fire({
                 title: 'Check-out Guest?',
@@ -601,10 +613,10 @@ $equipment_list = mysqli_fetch_all($equipment_list_res, MYSQLI_ASSOC);
                             reservation_id: id,
                             status: 4
                         }, // 4 = Completed/Checked-out
-                        success: function(response) {
+                        success: function (response) {
                             Swal.fire('Checked Out', 'Guest has been checked out.', 'success').then(() => location.reload());
                         },
-                        error: function() {
+                        error: function () {
                             Swal.fire('Error', 'Failed to check out.', 'error');
                         }
                     });
