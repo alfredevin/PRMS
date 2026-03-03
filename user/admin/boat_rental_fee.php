@@ -17,7 +17,6 @@ if (isset($_POST['add_rental'])) {
     if ($max_guest < $min_guest) {
         echo '<script>document.addEventListener("DOMContentLoaded", function () { Swal.fire({ icon: "error", title: "Invalid Guest Count!", text: "Maximum guests cannot be lower than Minimum guests." }); });</script>';
     } else {
-        // FIXED bind_param types: s=string, i=int, d=double
         $insert_query = "INSERT INTO boat_rental_fee_tbl (destination, min_guest, max_guest, amount, island_hopping_amount, description, num_days, is_vice_versa) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         $stmt = $conn->prepare($insert_query);
         $stmt->bind_param("siiddsii", $destination, $min_guest, $max_guest, $amount, $island_hopping_amount, $description, $num_days, $is_vice_versa);
@@ -43,7 +42,6 @@ if (isset($_POST['update_rental'])) {
     if ($max_guest < $min_guest) {
         echo '<script>document.addEventListener("DOMContentLoaded", function () { Swal.fire({ icon: "error", title: "Invalid Guest Count!", text: "Maximum guests cannot be lower than Minimum guests." }); });</script>';
     } else {
-        // FIXED SQL: Correct types for bind_param (siiddsiii)
         $update_query = "UPDATE boat_rental_fee_tbl SET destination=?, min_guest=?, max_guest=?, amount=?, island_hopping_amount=?, description=?, num_days=?, is_vice_versa=? WHERE rental_id=?";
         $stmt = $conn->prepare($update_query);
         $stmt->bind_param("siiddsiii", $destination, $min_guest, $max_guest, $amount, $island_hopping_amount, $description, $num_days, $is_vice_versa, $id);
@@ -87,31 +85,31 @@ if (isset($_POST['update_rental'])) {
                                         </div>
                                         <div class="form-row">
                                             <div class="form-group col-6">
-                                                <label class="small">Min Guest</label>
+                                                <label class="small font-weight-bold">Min Guest</label>
                                                 <input type="number" name="min_guest" class="form-control" value="1" required>
                                             </div>
                                             <div class="form-group col-6">
-                                                <label class="small">Max Guest</label>
+                                                <label class="small font-weight-bold">Max Guest</label>
                                                 <input type="number" name="max_guest" class="form-control" value="10" required>
                                             </div>
                                         </div>
                                         <div class="form-row">
                                             <div class="form-group col-6">
-                                                <label class="small">Days</label>
+                                                <label class="small font-weight-bold">Days</label>
                                                 <input type="number" name="num_days" class="form-control" value="1" required>
                                             </div>
                                             <div class="form-group col-6">
-                                                <label class="small">Price (₱)</label>
+                                                <label class="small font-weight-bold">Price (₱)</label>
                                                 <input type="number" name="amount" class="form-control" step="0.01" required>
                                             </div>
                                         </div>
                                         <div class="form-group mb-3">
-                                            <label class="small">Island Hopping Add-on (₱)</label>
+                                            <label class="small font-weight-bold">Island Hopping Add-on (₱)</label>
                                             <input type="number" name="island_hopping_amount" class="form-control" step="0.01">
                                         </div>
                                         <div class="form-group mb-3">
-                                            <label class="small">Description</label>
-                                            <textarea name="description" class="form-control" rows="2"></textarea>
+                                            <label class="small font-weight-bold text-primary">Description / Scope (e.g., Maniwaya, Mompong)</label>
+                                            <textarea name="description" class="form-control" rows="2" placeholder=""></textarea>
                                         </div>
                                         <button type="submit" name="add_rental" class="btn btn-success btn-block">Save Boat Trip</button>
                                     </form>
@@ -128,7 +126,7 @@ if (isset($_POST['update_rental'])) {
                                             <thead class="bg-light">
                                                 <tr>
                                                     <th>Destination</th>
-                                                    <th>Duration</th>
+                                                    <th>Scope / Sakop</th> <th>Duration</th>
                                                     <th>Capacity</th>
                                                     <th>Base Price</th>
                                                     <th>Action</th>
@@ -137,7 +135,6 @@ if (isset($_POST['update_rental'])) {
                                             <tbody>
                                                 <?php
                                                 $result = mysqli_query($conn, "SELECT * FROM boat_rental_fee_tbl ORDER BY rental_id DESC");
-                                                // FIXED: Changed $r to $rental to match Modal variables
                                                 while ($rental = mysqli_fetch_assoc($result)) {
                                                 ?>
                                                     <tr>
@@ -145,6 +142,7 @@ if (isset($_POST['update_rental'])) {
                                                             <strong><?= htmlspecialchars($rental['destination']) ?></strong>
                                                             <?= $rental['is_vice_versa'] ? '<span class="badge badge-vice-versa">Vice Versa</span>' : '' ?>
                                                         </td>
+                                                        <td><?= htmlspecialchars($rental['description']) ?></td>
                                                         <td><?= $rental['num_days'] ?> Day/s</td>
                                                         <td><?= $rental['min_guest'] ?>-<?= $rental['max_guest'] ?> pax</td>
                                                         <td>₱<?= number_format($rental['amount'], 2) ?></td>
@@ -166,7 +164,7 @@ if (isset($_POST['update_rental'])) {
                                                                         </div>
                                                                         <div class="custom-control custom-checkbox mb-3">
                                                                             <input type="checkbox" class="custom-control-input" id="vv<?= $rental['rental_id'] ?>" name="is_vice_versa" <?= $rental['is_vice_versa'] ? 'checked' : '' ?>>
-                                                                            <label class="custom-control-label small" for="vv<?= $rental['rental_id'] ?>">Include Vice Versa</label>
+                                                                            <label class="custom-control-label small font-weight-bold" for="vv<?= $rental['rental_id'] ?>">Include Vice Versa</label>
                                                                         </div>
                                                                         <div class="form-row">
                                                                             <div class="form-group col-6">
@@ -193,7 +191,7 @@ if (isset($_POST['update_rental'])) {
                                                                             <input type="number" name="island_hopping_amount" class="form-control" value="<?= $rental['island_hopping_amount'] ?>" step="0.01">
                                                                         </div>
                                                                         <div class="form-group">
-                                                                            <label class="small font-weight-bold">Description</label>
+                                                                            <label class="small font-weight-bold text-primary">Description / Scope (e.g., Maniwaya, Mompong)</label>
                                                                             <textarea name="description" class="form-control" rows="2"><?= htmlspecialchars($rental['description']) ?></textarea>
                                                                         </div>
                                                                     </div>
