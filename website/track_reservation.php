@@ -1,5 +1,4 @@
 <?php
- 
 include './../config.php';
 header('Content-Type: application/json');
 
@@ -25,7 +24,7 @@ if (isset($data['tracking_number'])) {
     if (mysqli_num_rows($result) > 0) {
         $row = mysqli_fetch_assoc($result);
         $reservation_id = $row['reservation_id'];
-        
+
         // Status Text Logic
         $status_map = [
             1 => '⏳ Pending Approval',
@@ -42,7 +41,7 @@ if (isset($data['tracking_number'])) {
         $services = [];
         $srv_sql = "SELECT s.service_name, s.service_price FROM reservation_services_tbl rs JOIN services_tbl s ON rs.service_id = s.service_id WHERE rs.reservation_id = '$reservation_id'";
         $srv_res = mysqli_query($conn, $srv_sql);
-        while($s = mysqli_fetch_assoc($srv_res)) {
+        while ($s = mysqli_fetch_assoc($srv_res)) {
             $services[] = ['name' => $s['service_name'], 'price' => $s['service_price']];
         }
 
@@ -50,10 +49,10 @@ if (isset($data['tracking_number'])) {
         $rentals = [];
         $rnt_sql = "SELECT r.rental_name, r.rental_price FROM reservation_rentals_tbl rr JOIN rentals_tbl r ON rr.rental_id = r.rental_id WHERE rr.reservation_id = '$reservation_id'";
         $rnt_res = mysqli_query($conn, $rnt_sql);
-        while($r = mysqli_fetch_assoc($rnt_res)) {
+        while ($r = mysqli_fetch_assoc($rnt_res)) {
             $rentals[] = ['name' => $r['rental_name'], 'price' => $r['rental_price']];
         }
-        
+
         // Fetch Boat Rentals
         $boats = [];
         $boat_sql = "SELECT b.amount, br.destination, b.include_island, br.island_hopping_amount 
@@ -61,7 +60,7 @@ if (isset($data['tracking_number'])) {
                      JOIN boat_rental_fee_tbl br ON b.rental_id = br.rental_id 
                      WHERE b.tracking_number = '$tracking'";
         $boat_res = mysqli_query($conn, $boat_sql);
-        while($b = mysqli_fetch_assoc($boat_res)) {
+        while ($b = mysqli_fetch_assoc($boat_res)) {
             $boats[] = [
                 'name' => $b['destination'] . ($b['include_island'] ? ' (+Island Hopping)' : ''),
                 'price' => $b['amount']
@@ -72,6 +71,14 @@ if (isset($data['tracking_number'])) {
         $total_price = floatval($row['total_price']);
         $amount_paid = floatval($row['amount_paid'] ?? 0);
         $balance = $total_price - $amount_paid;
+
+        // BUSINESS LOGIC FIX: Force balance to 0 if booking is Completed (Status 4)
+        if ($row['status'] == 4) {
+            $balance = 0;
+            // Para mag-match yung binayad sa total sa dashboard ng customer
+            $amount_paid = $total_price;
+        }
+
         $payment_option = $row['payment_option'] == 'downpayment' ? '50% Downpayment' : 'Full Payment';
 
         echo json_encode([

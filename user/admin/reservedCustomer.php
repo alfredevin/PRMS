@@ -48,7 +48,7 @@ include '../../config.php';
                                             <tr>
                                                 <td><?= $counter++; ?></td>
                                                 <td><?= $res['tracking_number'] ?></td>
-                                                <td><?= $res['guest_phone'] ?></td>
+                                                <td><?= $res['guest_name'] ?></td>
                                                 <td><?= $checkIn ?></td>
                                                 <td><?= $checkOut ?></td>
                                                 <td>

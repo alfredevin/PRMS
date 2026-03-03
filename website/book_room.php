@@ -197,7 +197,8 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0;
                     <div class="card-body p-4">
                         <h3 class="text-primary fw-bold mb-1"><?= htmlspecialchars($room['room_name']) ?></h3>
                         <h6 class="text-uppercase text-muted fw-bold mb-3">
-                            <?= htmlspecialchars($room['room_type_name']) ?></h6>
+                            <?= htmlspecialchars($room['room_type_name']) ?>
+                        </h6>
 
                         <div class="mb-4 p-3 bg-light rounded-3">
                             <?php if ($active_discount > 0): ?>
@@ -486,12 +487,14 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0;
                                                             <label class="form-check-label w-100"
                                                                 for="event<?= $event['event_id'] ?>" style="cursor: pointer;">
                                                                 <h6 class="fw-bold mb-2" style="color: #0d6efd;">
-                                                                    <?= htmlspecialchars($event['event_name']) ?></h6>
+                                                                    <?= htmlspecialchars($event['event_name']) ?>
+                                                                </h6>
                                                                 <small class="text-muted d-block">📅
                                                                     <?= $formatted_date ?></small>
                                                                 <small class="text-muted d-block">🕐
-                                                                    <?= $formatted_time ?>        <?php if ($formatted_end)
-                                                                                  echo " - " . $formatted_end; ?></small>
+                                                                    <?= $formatted_time ?>
+                                                                    <?php if ($formatted_end)
+                                                                        echo " - " . $formatted_end; ?></small>
                                                                 <small
                                                                     class="text-muted d-block mt-2"><?= htmlspecialchars(substr($event['description'], 0, 50)) ?>...</small>
                                                             </label>
@@ -515,41 +518,94 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0;
 
                             <div class="form-step d-none">
                                 <h4 class="mb-4 text-primary fw-bold">Boat Rental</h4>
-                                <div class="table-responsive">
-                                    <table class="table table-hover align-middle">
+                                <p class="text-muted mb-4">Pumili ng byahe para sa inyong island adventure. Pwede rin
+                                    mag-add ng island hopping!</p>
+
+                                <div class="table-responsive bg-white rounded-4 shadow-sm border">
+                                    <table class="table table-hover align-middle mb-0">
                                         <thead class="table-light">
                                             <tr>
-                                                <th>Select</th>
+                                                <th class="ps-4">Select</th>
                                                 <th>Destination</th>
+                                                <th>Scope </th>
+                                                <th>Duration</th>
                                                 <th>Guests</th>
-                                                <th>Fee</th>
-                                                <th>Island Hop</th>
-                                                <th>Add Hop?</th>
+                                                <th>Base Fee</th>
+                                                <th class="pe-4">Island Hop</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             <?php
                                             $boat_rental_fee = $conn->query("SELECT * FROM boat_rental_fee_tbl");
-                                            while ($boat = $boat_rental_fee->fetch_assoc()) { ?>
-                                                <tr>
-                                                    <td><input class="form-check-input boat-check" type="checkbox"
-                                                            value="<?= $boat['rental_id'] ?>"
-                                                            data-boat="<?= $boat['amount'] ?>"
-                                                            data-island="<?= $boat['island_hopping_amount'] ?>"></td>
-                                                    <td><?= $boat['destination'] ?></td>
-                                                    <td><?= $boat['min_guest'] . '-' . $boat['max_guest'] ?></td>
-                                                    <td>₱<?= number_format($boat['amount'], 2) ?></td>
-                                                    <td>₱<?= number_format($boat['island_hopping_amount'], 2) ?></td>
-                                                    <td><input type="checkbox" class="include-island form-check-input"></td>
-                                                </tr>
-                                            <?php } ?>
+                                            if ($boat_rental_fee->num_rows > 0) {
+                                                while ($boat = $boat_rental_fee->fetch_assoc()) {
+                                                    ?>
+                                                    <tr>
+                                                        <td class="ps-4">
+                                                            <div class="form-check form-switch fs-5 mb-0">
+                                                                <input class="form-check-input boat-check shadow-none"
+                                                                    type="checkbox" value="<?= $boat['rental_id'] ?>"
+                                                                    data-boat="<?= $boat['amount'] ?>"
+                                                                    data-island="<?= $boat['island_hopping_amount'] ?>"
+                                                                    style="cursor: pointer;">
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <div class="fw-bold text-dark fs-6">
+                                                                <?= htmlspecialchars($boat['destination']) ?>
+                                                            </div>
+                                                            <?php if ($boat['is_vice_versa'] == 1): ?>
+                                                                <span class="badge bg-info text-dark rounded-pill"
+                                                                    style="font-size: 0.7em;">Vice Versa</span>
+                                                            <?php endif; ?>
+                                                        </td>
+                                                        <td>
+                                                            <small class="text-muted"><i
+                                                                    class="bi bi-geo-alt-fill text-danger me-1"></i><?= htmlspecialchars($boat['description'] ?: 'No Set Scope') ?></small>
+                                                        </td>
+                                                        <td>
+                                                            <span class="badge bg-light text-dark border"><i
+                                                                    class="bi bi-clock me-1"></i><?= $boat['num_days'] ?>
+                                                                Day/s</span>
+                                                        </td>
+                                                        <td>
+                                                            <span class="badge bg-light text-dark border"><i
+                                                                    class="bi bi-people-fill me-1"></i><?= $boat['min_guest'] . '-' . $boat['max_guest'] ?></span>
+                                                        </td>
+                                                        <td><strong
+                                                                class="text-primary">₱<?= number_format($boat['amount'], 2) ?></strong>
+                                                        </td>
+                                                        <td class="pe-4">
+                                                            <?php if ($boat['island_hopping_amount'] > 0): ?>
+                                                                <div class="form-check">
+                                                                    <input type="checkbox"
+                                                                        class="include-island form-check-input border-secondary shadow-none"
+                                                                        style="cursor: pointer;">
+                                                                    <label class="form-check-label small fw-bold text-success">
+                                                                        +₱<?= number_format($boat['island_hopping_amount'], 2) ?>
+                                                                    </label>
+                                                                </div>
+                                                            <?php else: ?>
+                                                                <span class="small text-muted fst-italic">Not Available</span>
+                                                                <input type="checkbox"
+                                                                    class="include-island form-check-input d-none">
+                                                            <?php endif; ?>
+                                                        </td>
+                                                    </tr>
+                                                    <?php
+                                                }
+                                            }
+                                            ?>
                                         </tbody>
                                     </table>
                                 </div>
-                                <h5 class="text-end mt-3">Total Boat Fee: <span class="text-success fw-bold">₱<span
-                                            id="totalAmount">0.00</span></span></h5>
-                            </div>
 
+                                <div
+                                    class="d-flex justify-content-end align-items-center mt-4 p-3 bg-light rounded-3 border">
+                                    <h5 class="mb-0 me-3 text-muted">Total Boat Fee:</h5>
+                                    <h3 class="mb-0 text-success fw-bold">₱<span id="totalAmount">0.00</span></h3>
+                                </div>
+                            </div>
                             <div class="form-step d-none">
                                 <h4 class="mb-4 text-primary fw-bold">Additional Services</h4>
                                 <div class="row g-3">
@@ -687,7 +743,8 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0;
                                 <div class="bg-light p-4 rounded-4 mb-4 border">
                                     <div class="d-flex justify-content-between mb-2 text-muted"><span>Room Fee</span>
                                         <input class="border-0 bg-transparent text-end fw-bold text-dark"
-                                            id="room_payment" readonly></div>
+                                            id="room_payment" readonly>
+                                    </div>
 
                                     <div class="d-flex justify-content-between mb-2 text-primary">
                                         <span>Entrance Fee (<span id="guest_summary_count">1</span> Guests)</span>
@@ -697,7 +754,8 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0;
 
                                     <div class="d-flex justify-content-between mb-2 text-muted"><span>Boat Fee</span>
                                         <input class="border-0 bg-transparent text-end" id="boat_rentals_payment"
-                                            readonly></div>
+                                            readonly>
+                                    </div>
                                     <div class="d-flex justify-content-between mb-2 text-muted"><span>Services
                                             Fee</span> <input class="border-0 bg-transparent text-end"
                                             id="services_payment" readonly></div>
@@ -729,9 +787,10 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0;
                                         </select>
                                     </div>
                                     <div class="col-md-6">
-                                        <label class="form-label fw-bold">Account Number</label>
+                                        <label class="form-label fw-bold text-muted">Account Number</label>
                                         <input type="text" class="form-control form-control-lg" id="payment_number"
-                                            readonly>
+                                            style="pointer-events: none; user-select: none; background-color: #e9ecef; color: #6c757d;"
+                                            disabled readonly>
                                     </div>
 
                                     <div class="col-md-6">
