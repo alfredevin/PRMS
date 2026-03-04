@@ -327,8 +327,9 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0;
                                                 type="button" id="guestDropdown" data-bs-toggle="dropdown"
                                                 data-bs-auto-close="outside" aria-expanded="false">
                                                 <span id="guestSummary">1 Adult, 0 Children, 0 Seniors</span>
-                                                <i class="fas fa-chevron-down"></i>
+                                                <i class="bi bi-chevron-down"></i>
                                             </button>
+
                                             <div class="dropdown-menu p-3 w-100 shadow border-0 rounded-3"
                                                 aria-labelledby="guestDropdown" style="min-width: 300px;">
                                                 <div class="d-flex justify-content-between align-items-center mb-3">
@@ -382,16 +383,42 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0;
                                                             style="width:32px;height:32px;">+</button>
                                                     </div>
                                                 </div>
-                                                <div id="adultAgesContainer" class="border-top pt-3 mt-2"><small
-                                                        class="text-muted d-block mb-2 fw-bold">Adult Details:</small>
+                                                <div id="childAgesContainer" class="border-top pt-3 mt-2 d-none">
+                                                    <small class="text-muted d-block mb-2 fw-bold">Child
+                                                        Details:</small>
                                                 </div>
-                                                <div id="childAgesContainer" class="border-top pt-3 mt-2 d-none"><small
-                                                        class="text-muted d-block mb-2 fw-bold">Child Details:</small>
+                                                <div id="adultAgesContainer" class="border-top pt-3 mt-2 d-none">
+                                                    <small class="text-muted d-block mb-2 fw-bold">Adult Details
+                                                        (optional)</small>
                                                 </div>
-                                                <div id="seniorAgesContainer" class="border-top pt-3 mt-2 d-none"><small
-                                                        class="text-muted d-block mb-2 fw-bold">Senior Details:</small>
+                                                <div id="seniorAgesContainer" class="border-top pt-3 mt-2 d-none">
+                                                    <small class="text-muted d-block mb-2 fw-bold">Senior Details
+                                                        (optional)</small>
                                                 </div>
-
+                                                <div class="border-top pt-3 mt-2">
+                                                    <small class="text-muted d-block mb-2 fw-bold">Gender of Primary
+                                                        Guest:</small>
+                                                    <div class="d-flex gap-2">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="radio" name="gender"
+                                                                id="genderMale" value="Male" checked>
+                                                            <label class="form-check-label"
+                                                                for="genderMale">Male</label>
+                                                        </div>
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="radio" name="gender"
+                                                                id="genderFemale" value="Female">
+                                                            <label class="form-check-label"
+                                                                for="genderFemale">Female</label>
+                                                        </div>
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="radio" name="gender"
+                                                                id="genderOther" value="Other">
+                                                            <label class="form-check-label"
+                                                                for="genderOther">Other</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                                 <input type="hidden" name="adults" id="inputAdults" value="1">
                                                 <input type="hidden" name="children" id="inputChildren" value="0">
                                                 <input type="hidden" name="seniors" id="inputSeniors" value="0">
@@ -946,20 +973,28 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0;
         function addChildAgeSelect(index) {
             const container = document.getElementById('childAgesContainer');
             const div = document.createElement('div');
+            div.className = 'mb-2 child-age-input';
 
-            // DITO MO ILALAGAY YUNG PARA SA CHILD
-            div.className = 'mb-2 d-flex align-items-center justify-content-between gap-2 child-row-entry';
-
-            let ageOps = '<option value="" disabled selected>Age</option>';
-            for (let i = 0; i <= 17; i++) ageOps += `<option value="${i}">${i}</option>`;
+            // Generate age options for children 0-17
+            let ageOptions = '';
+            for (let i = 0; i <= 17; i++) {
+                ageOptions += `<option value="${i}">${i} years old</option>`;
+            }
 
             div.innerHTML = `
-        <span class="small fw-bold">Child ${index}</span>
-        <select class="form-select form-select-sm w-auto required" name="child_ages[]">${ageOps}</select>
-        <select class="form-select form-select-sm w-auto required" name="child_genders[]">
-            <option value="" disabled selected>Gender</option>
-            <option value="Male">Male</option><option value="Female">Female</option>
-        </select>`;
+                <div class="d-flex align-items-center justify-content-between gap-2">
+                    <span class="small fw-bold text-dark">Child ${index}</span>
+                    <select class="form-select form-select-sm w-auto" name="child_ages[]" required style="min-width: 120px;">
+                        <option value="" disabled selected>Select age</option>
+                        ${ageOptions}
+                    </select>
+                    <select class="form-select form-select-sm w-auto" name="child_genders[]" required style="min-width: 120px;">
+                        <option value="" disabled selected>Select gender</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                    </select>
+                </div>
+            `;
             container.appendChild(div);
         }
 
@@ -972,20 +1007,25 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0;
         function addAdultAgeSelect(index) {
             const container = document.getElementById('adultAgesContainer');
             const div = document.createElement('div');
-
-            // DITO MO ILALAGAY YUNG PARA SA ADULT
-            div.className = 'mb-2 d-flex align-items-center justify-content-between gap-2 adult-row-entry';
-
-            let ageOps = '<option value="" disabled selected>Age</option>';
-            for (let i = 18; i <= 59; i++) ageOps += `<option value="${i}">${i}</option>`;
-
+            div.className = 'mb-2 adult-age-input';
+            let ageOptions = '';
+            for (let i = 18; i <= 59; i++) {
+                ageOptions += `<option value="${i}">${i} years old</option>`;
+            }
             div.innerHTML = `
-        <span class="small fw-bold">Adult ${index}</span>
-        <select class="form-select form-select-sm w-auto required" name="adult_ages[]">${ageOps}</select>
-        <select class="form-select form-select-sm w-auto required" name="adult_genders[]">
-            <option value="" disabled selected>Gender</option>
-            <option value="Male">Male</option><option value="Female">Female</option>
-        </select>`;
+                <div class="d-flex align-items-center justify-content-between gap-2">
+                    <span class="small fw-bold text-dark">Adult ${index}</span>
+                    <select class="form-select form-select-sm w-auto" name="adult_ages[]" style="min-width: 120px;">
+                        <option value="" disabled selected>Select age</option>
+                        ${ageOptions}
+                    </select>
+                    <select class="form-select form-select-sm w-auto" name="adult_genders[]" style="min-width: 120px;">
+                        <option value="" disabled selected>Select gender</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                    </select>
+                </div>
+            `;
             container.appendChild(div);
         }
 
@@ -998,20 +1038,25 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0;
         function addSeniorAgeSelect(index) {
             const container = document.getElementById('seniorAgesContainer');
             const div = document.createElement('div');
-
-            // DITO MO ILALAGAY YUNG PARA SA SENIOR
-            div.className = 'mb-2 d-flex align-items-center justify-content-between gap-2 senior-row-entry';
-
-            let ageOps = '<option value="" disabled selected>Age</option>';
-            for (let i = 60; i <= 100; i++) ageOps += `<option value="${i}">${i}</option>`;
-
+            div.className = 'mb-2 senior-age-input';
+            let ageOptions = '';
+            for (let i = 60; i <= 100; i++) {
+                ageOptions += `<option value="${i}">${i} years old</option>`;
+            }
             div.innerHTML = `
-        <span class="small fw-bold">Senior ${index}</span>
-        <select class="form-select form-select-sm w-auto required" name="senior_ages[]">${ageOps}</select>
-        <select class="form-select form-select-sm w-auto required" name="senior_genders[]">
-            <option value="" disabled selected>Gender</option>
-            <option value="Male">Male</option><option value="Female">Female</option>
-        </select>`;
+                <div class="d-flex align-items-center justify-content-between gap-2">
+                    <span class="small fw-bold text-dark">Senior ${index}</span>
+                    <select class="form-select form-select-sm w-auto" name="senior_ages[]" style="min-width: 120px;">
+                        <option value="" disabled selected>Select age</option>
+                        ${ageOptions}
+                    </select>
+                    <select class="form-select form-select-sm w-auto" name="senior_genders[]" required style="min-width: 120px;">
+                        <option value="" disabled selected>Select gender</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                    </select>
+                </div>
+            `;
             container.appendChild(div);
         }
 
@@ -1022,35 +1067,24 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0;
 
         // Ensure the number of age selectors matches the counts
         function syncAgeSelectors() {
-            const aC = document.getElementById('adultAgesContainer');
-            const cC = document.getElementById('childAgesContainer');
-            const sC = document.getElementById('seniorAgesContainer');
+            const adultContainer = document.getElementById('adultAgesContainer');
+            const childContainer = document.getElementById('childAgesContainer');
+            const seniorContainer = document.getElementById('seniorAgesContainer');
 
-            // ADULTS: Magsisimula na ito sa 1 dahil sa querySelector logic
-            while (aC.querySelectorAll('.adult-row-entry').length < adults) {
-                addAdultAgeSelect(aC.querySelectorAll('.adult-row-entry').length + 1);
-            }
-            while (aC.querySelectorAll('.adult-row-entry').length > adults) {
-                aC.removeChild(aC.lastChild);
-            }
+            // adults
+            while (adultContainer.children.length < adults) addAdultAgeSelect(adultContainer.children.length + 1);
+            while (adultContainer.children.length > adults) removeAdultAgeSelect();
+            adultContainer.classList.toggle('d-none', adults === 0);
 
-            // CHILDREN
-            while (cC.querySelectorAll('.child-row-entry').length < children) {
-                addChildAgeSelect(cC.querySelectorAll('.child-row-entry').length + 1);
-            }
-            while (cC.querySelectorAll('.child-row-entry').length > children) {
-                cC.removeChild(cC.lastChild);
-            }
-            cC.classList.toggle('d-none', children === 0);
+            // children
+            while (childContainer.children.length < children) addChildAgeSelect(childContainer.children.length + 1);
+            while (childContainer.children.length > children) removeChildAgeSelect();
+            childContainer.classList.toggle('d-none', children === 0);
 
-            // SENIORS
-            while (sC.querySelectorAll('.senior-row-entry').length < seniors) {
-                addSeniorAgeSelect(sC.querySelectorAll('.senior-row-entry').length + 1);
-            }
-            while (sC.querySelectorAll('.senior-row-entry').length > seniors) {
-                sC.removeChild(sC.lastChild);
-            }
-            sC.classList.toggle('d-none', seniors === 0);
+            // seniors
+            while (seniorContainer.children.length < seniors) addSeniorAgeSelect(seniorContainer.children.length + 1);
+            while (seniorContainer.children.length > seniors) removeSeniorAgeSelect();
+            seniorContainer.classList.toggle('d-none', seniors === 0);
         }
 
         // 2. ROOM COST LOGIC (With Discount)
@@ -1553,12 +1587,23 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0;
                     let formData = new FormData(form);
 
                     // --- CALCULATE GENDER TOTALS ---
-                    // --- CALCULATE GENDER TOTALS ---
                     let maleCount = 0;
                     let femaleCount = 0;
 
-                    // Kunin ang lahat ng genders mula sa lahat ng dropdowns (Adult 1, Adult 2, etc.)
-                    ['adult_genders[]', 'child_genders[]', 'senior_genders[]'].forEach(name => {
+                    // 1. Primary Guest Gender
+                    const primaryGender = document.querySelector('input[name="gender"]:checked').value;
+                    if (primaryGender === "Male") maleCount++;
+                    else if (primaryGender === "Female") femaleCount++;
+
+                    // 2. Count Adult Genders (Starting from index 1 because index 0 is the primary guest)
+                    document.querySelectorAll('select[name="adult_genders[]"]').forEach((sel, index) => {
+                        if (index === 0) return; // Skip first adult if handled by primary gender radio
+                        if (sel.value === "Male") maleCount++;
+                        else if (sel.value === "Female") femaleCount++;
+                    });
+
+                    // 3. Count Children and Seniors
+                    ['child_genders[]', 'senior_genders[]'].forEach(name => {
                         document.querySelectorAll(`select[name="${name}"]`).forEach(sel => {
                             if (sel.value === "Male") maleCount++;
                             else if (sel.value === "Female") femaleCount++;

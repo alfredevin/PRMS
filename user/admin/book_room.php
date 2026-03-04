@@ -9,7 +9,7 @@ if (!isset($_GET['room_id'])) {
 
 $room_id = mysqli_real_escape_string($conn, $_GET['room_id']);
 
-// 1. FETCH ROOM + DISCOUNT LOGIC (Same as Online)
+// 1. FETCH ROOM + DISCOUNT LOGIC
 $sql = "SELECT r.*, t.room_type_name, 
                 d.discount_name, d.discount_percent, d.start_date, d.end_date 
         FROM rooms_tbl r
@@ -43,13 +43,11 @@ if ($active_discount > 0) {
     $final_price = $orig_price - ($orig_price * ($active_discount / 100));
 }
 
-// ... (pagkatapos ng Room fetch logic)
-
-// 3. FETCH ENTRANCE FEE (Kukunin ang presyo sa database)
+// 3. FETCH ENTRANCE FEE
 $fee_sql = "SELECT entrance_fee_amount FROM entrance_fee_tbl LIMIT 1";
 $fee_res = mysqli_query($conn, $fee_sql);
 $fee_data = mysqli_fetch_assoc($fee_res);
-$entrance_rate = $fee_data['entrance_fee_amount'] ?? 0; // Default to 0 if walang laman
+$entrance_rate = $fee_data['entrance_fee_amount'] ?? 0;
 ?>
 
 <!DOCTYPE html>
@@ -73,7 +71,6 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0; // Default to 0 if walan
         font-weight: bold;
     }
 
-    /* Admin Primary Color */
     .step.completed {
         border-color: #1cc88a;
         color: #1cc88a;
@@ -82,7 +79,6 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0; // Default to 0 if walan
     .room-card-sticky {
         position: sticky;
         top: 90px;
-        /* Adjusted for Admin Navbar */
         z-index: 10;
         transition: top 0.3s;
     }
@@ -126,12 +122,10 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0; // Default to 0 if walan
         border-radius: 0.35rem;
     }
 
-    /* Flatpickr z-index fix for admin template */
     .flatpickr-calendar {
         z-index: 9999 !important;
     }
 
-    /* Hide island hop checkbox until a boat is selected */
     .include-island {
         display: none;
         margin-left: auto;
@@ -228,6 +222,7 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0; // Default to 0 if walan
                                     <form id="multiStepForm" enctype="multipart/form-data" method="POST">
                                         <input type="hidden" name="room_id" value="<?= $room_id ?>">
                                         <input type="hidden" name="is_walkin" value="1">
+
                                         <div class="form-step">
                                             <h5 class="font-weight-bold text-primary mb-3">Guest Information</h5>
 
@@ -295,7 +290,7 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0; // Default to 0 if walan
                                                                 class="d-flex justify-content-between align-items-center mb-2">
                                                                 <div>
                                                                     <h6 class="m-0 font-weight-bold">Children</h6>
-                                                                    <small>Ages <-18 </small>
+                                                                    <small>Ages &lt; 18 </small>
                                                                 </div>
                                                                 <div>
                                                                     <button type="button"
@@ -325,48 +320,25 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0; // Default to 0 if walan
                                                                         onclick="updateCount('senior', 1)">+</button>
                                                                 </div>
                                                             </div>
+
                                                             <div id="childAgesContainer" class="border-top pt-2 d-none">
-                                                                <small class="text-muted d-block mb-2">Child
-                                                                    Ages:</small>
+                                                                <small
+                                                                    class="text-muted d-block mb-2 font-weight-bold">Child
+                                                                    Details:</small>
                                                             </div>
                                                             <div id="adultAgesContainer"
                                                                 class="border-top pt-2 mt-2 d-none">
-                                                                <small class="text-muted d-block mb-2">Adult Ages
-                                                                    (optional)</small>
+                                                                <small
+                                                                    class="text-muted d-block mb-2 font-weight-bold">Adult
+                                                                    Details:</small>
                                                             </div>
                                                             <div id="seniorAgesContainer"
                                                                 class="border-top pt-2 mt-2 d-none">
-                                                                <small class="text-muted d-block mb-2">Senior Ages
-                                                                    (optional)</small>
-                                                            </div>
-                                                            <div class="border-top pt-2 mt-2">
                                                                 <small
-                                                                    class="text-muted d-block mb-2 font-weight-bold">Gender
-                                                                    of Primary Guest:</small>
-                                                                <div class="d-flex gap-2">
-                                                                    <div class="custom-control custom-radio">
-                                                                        <input type="radio" id="genderMale"
-                                                                            name="gender" value="Male"
-                                                                            class="custom-control-input" checked>
-                                                                        <label class="custom-control-label"
-                                                                            for="genderMale">Male</label>
-                                                                    </div>
-                                                                    <div class="custom-control custom-radio">
-                                                                        <input type="radio" id="genderFemale"
-                                                                            name="gender" value="Female"
-                                                                            class="custom-control-input">
-                                                                        <label class="custom-control-label"
-                                                                            for="genderFemale">Female</label>
-                                                                    </div>
-                                                                    <div class="custom-control custom-radio">
-                                                                        <input type="radio" id="genderOther"
-                                                                            name="gender" value="Other"
-                                                                            class="custom-control-input">
-                                                                        <label class="custom-control-label"
-                                                                            for="genderOther">Other</label>
-                                                                    </div>
-                                                                </div>
+                                                                    class="text-muted d-block mb-2 font-weight-bold">Senior
+                                                                    Details:</small>
                                                             </div>
+
                                                             <input type="hidden" name="adults" id="inputAdults"
                                                                 value="1">
                                                             <input type="hidden" name="children" id="inputChildren"
@@ -375,25 +347,22 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0; // Default to 0 if walan
                                                                 value="0">
                                                             <input type="hidden" id="totalGuests" name="guests"
                                                                 value="1">
-                                                            <input type="hidden" id="inputGender" name="inputGender"
-                                                                value="Male">
                                                         </div>
                                                     </div>
                                                 </div>
+                                            </div>
 
-                                                <div class="form-group col-md-6">
-                                                    <label class="font-weight-bold small">Tourist Type</label>
-                                                    <div class="btn-group btn-group-toggle w-100" role="group"
-                                                        data-toggle="buttons">
-                                                        <label class="btn btn-outline-primary active w-50">
-                                                            <input type="radio" name="tourist_type" value="Local"
-                                                                checked> Local
-                                                        </label>
-                                                        <label class="btn btn-outline-primary w-50">
-                                                            <input type="radio" name="tourist_type" value="Foreign">
-                                                            Foreign
-                                                        </label>
-                                                    </div>
+                                            <div class="form-group col-md-6 px-0">
+                                                <label class="font-weight-bold small">Tourist Type</label>
+                                                <div class="btn-group btn-group-toggle w-100" role="group"
+                                                    data-toggle="buttons">
+                                                    <label class="btn btn-outline-primary active w-50">
+                                                        <input type="radio" name="tourist_type" value="Local" checked>
+                                                        Local
+                                                    </label>
+                                                    <label class="btn btn-outline-primary w-50">
+                                                        <input type="radio" name="tourist_type" value="Foreign"> Foreign
+                                                    </label>
                                                 </div>
                                             </div>
 
@@ -543,7 +512,6 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0; // Default to 0 if walan
                                         <div class="form-step d-none">
                                             <h5 class="font-weight-bold text-primary mb-3">Payment Details</h5>
 
-                                            <!-- Summary Card -->
                                             <div class="card border-0 bg-white mb-3 shadow-sm">
                                                 <div class="card-header bg-light d-flex justify-content-between align-items-center"
                                                     style="cursor: pointer;" data-toggle="collapse"
@@ -553,15 +521,12 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0; // Default to 0 if walan
                                                 </div>
                                                 <div class="collapse show" id="summaryPanel">
                                                     <div class="card-body">
-                                                        <!-- Events Summary -->
                                                         <div class="mb-3">
                                                             <h6 class="font-weight-bold text-primary mb-2">Events</h6>
                                                             <div id="summary_events" class="small text-muted pl-3">
                                                                 <p class="mb-0">No events selected</p>
                                                             </div>
                                                         </div>
-
-                                                        <!-- Boat Summary -->
                                                         <div class="mb-3">
                                                             <h6 class="font-weight-bold text-primary mb-2">Boat Rental
                                                             </h6>
@@ -569,16 +534,12 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0; // Default to 0 if walan
                                                                 <p class="mb-0">No boat selected</p>
                                                             </div>
                                                         </div>
-
-                                                        <!-- Services Summary -->
                                                         <div class="mb-3">
                                                             <h6 class="font-weight-bold text-primary mb-2">Services</h6>
                                                             <div id="summary_services" class="small text-muted pl-3">
                                                                 <p class="mb-0">No services selected</p>
                                                             </div>
                                                         </div>
-
-                                                        <!-- Rentals Summary -->
                                                         <div class="mb-3">
                                                             <h6 class="font-weight-bold text-primary mb-2">Equipment
                                                                 Rentals</h6>
@@ -605,9 +566,13 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0; // Default to 0 if walan
                                                     <span id="boat_rentals_payment">₱0.00</span>
                                                 </div>
                                                 <div class="d-flex justify-content-between mb-1"><span>Services
-                                                        Fee</span> <span id="services_payment">₱0.00</span></div>
+                                                        Fee</span>
+                                                    <span id="services_payment">₱0.00</span>
+                                                </div>
                                                 <div class="d-flex justify-content-between mb-1"><span>Rentals
-                                                        Fee</span> <span id="rentals_payment">₱0.00</span></div>
+                                                        Fee</span>
+                                                    <span id="rentals_payment">₱0.00</span>
+                                                </div>
                                                 <hr>
                                                 <div class="d-flex justify-content-between align-items-center">
                                                     <span class="h5 font-weight-bold">Total Amount</span>
@@ -616,7 +581,6 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0; // Default to 0 if walan
                                                         id="total_payment" readonly value="₱0.00">
                                                     <input type="hidden" name="total_payments"
                                                         id="total_payments_value">
-
                                                     <input type="hidden" name="total_entrance_fee"
                                                         id="total_entrance_fee_value">
                                                 </div>
@@ -677,7 +641,6 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0; // Default to 0 if walan
                                             <button type="button" id="nextBtn"
                                                 class="btn btn-primary shadow-sm">Next</button>
                                         </div>
-
                                     </form>
                                 </div>
                             </div>
@@ -697,7 +660,6 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0; // Default to 0 if walan
     <script>
         $(document).ready(function () {
             $('#guestDropdown').parent().on('hide.bs.dropdown', function (e) {
-                // Check if the click originated from within the dropdown menu
                 if ($(e.clickEvent.target).closest('.dropdown-menu').length) {
                     e.preventDefault();
                 }
@@ -710,20 +672,12 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0; // Default to 0 if walan
         let seniors = 0;
         const maxGuests = <?= $room['max_guest'] ?>;
 
-        // initialize age selector containers on load
         document.addEventListener('DOMContentLoaded', function () {
             syncAgeSelectors();
-            // disable/hide island hop checkboxes initially
             document.querySelectorAll('.include-island').forEach(ii => {
                 ii.disabled = true;
                 ii.checked = false;
                 ii.style.display = 'none';
-            });
-            // Add gender radio button listeners
-            document.querySelectorAll('input[name="gender"]').forEach(radio => {
-                radio.addEventListener('change', function () {
-                    document.getElementById('inputGender').value = this.value;
-                });
             });
         });
 
@@ -731,18 +685,15 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0; // Default to 0 if walan
             const total = adults + children + seniors;
             if (type === 'adult') {
                 if (change === 1 && total < maxGuests) adults++;
-                if (change === -1 && adults > 1) adults--;
+                if (change === -1 && adults > 1) adults--; // Ensure at least 1 adult
             } else if (type === 'child') {
-                if (change === 1 && total < maxGuests) {
-                    children++;
-                }
-                if (change === -1 && children > 0) {
-                    children--;
-                }
+                if (change === 1 && total < maxGuests) children++;
+                if (change === -1 && children > 0) children--;
             } else if (type === 'senior') {
                 if (change === 1 && total < maxGuests) seniors++;
                 if (change === -1 && seniors > 0) seniors--;
             }
+
             document.getElementById('adultCount').innerText = adults;
             document.getElementById('childCount').innerText = children;
             document.getElementById('seniorCount').innerText = seniors;
@@ -750,12 +701,11 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0; // Default to 0 if walan
             document.getElementById('inputChildren').value = children;
             document.getElementById('inputSeniors').value = seniors;
             document.getElementById('totalGuests').value = adults + children + seniors;
+
             let summaryText = `${adults} Adult${adults > 1 ? 's' : ''}`;
             if (children > 0) summaryText += `, ${children} Child${children > 1 ? 'ren' : ''}`;
             if (seniors > 0) summaryText += `, ${seniors} Senior${seniors > 1 ? 's' : ''}`;
             document.getElementById('guestSummary').innerText = summaryText;
-            const ac = document.getElementById('childAgesContainer');
-            children > 0 ? ac.classList.remove('d-none') : ac.classList.add('d-none');
 
             syncAgeSelectors();
         }
@@ -763,91 +713,97 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0; // Default to 0 if walan
         function addChildAgeSelect(index) {
             const d = document.createElement('div');
             d.className = 'd-flex justify-content-between align-items-center mb-2 small gap-2';
-            let ops = '';
+            let ops = '<option value="" disabled selected>Age</option>';
             for (let i = 0; i <= 17; i++) ops += `<option value="${i}">${i} yrs</option>`;
 
             d.innerHTML = `
-        <span class="mr-2 text-nowrap">Child ${index}</span>
-        <select class="form-control form-control-sm mr-1" name="child_ages[]">${ops}</select>
-        <select class="form-control form-control-sm" name="child_genders[]">
-            <option value="Male">Male</option>
-            <option value="Female">Female</option>
-        </select>`;
+                <span class="mr-2 text-nowrap font-weight-bold">Child ${index}</span>
+                <select class="form-control form-control-sm mr-1 required" name="child_ages[]">${ops}</select>
+                <select class="form-control form-control-sm required" name="child_genders[]">
+                    <option value="" disabled selected>Gender</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                </select>`;
             document.getElementById('childAgesContainer').appendChild(d);
         }
+
         function removeChildAgeSelect() {
             const c = document.getElementById('childAgesContainer');
-            if (c.lastChild) c.removeChild(c.lastChild);
+            if (c.lastChild && c.children.length > 1) c.removeChild(c.lastChild);
         }
 
-        // Adult age helpers
         function addAdultAgeSelect(index) {
             const container = document.getElementById('adultAgesContainer');
             const div = document.createElement('div');
             div.className = 'd-flex justify-content-between align-items-center mb-2 small gap-2';
-            let ops = '';
+            let ops = '<option value="" disabled selected>Age</option>';
             for (let i = 18; i <= 59; i++) ops += `<option value="${i}">${i} yrs</option>`;
 
             div.innerHTML = `
-        <span class="mr-2 text-nowrap">Adult ${index}</span>
-        <select class="form-control form-control-sm mr-1" name="adult_ages[]">${ops}</select>
-        <select class="form-control form-control-sm" name="adult_genders[]">
-            <option value="Male">Male</option>
-            <option value="Female">Female</option>
-        </select>`;
+                <span class="mr-2 text-nowrap font-weight-bold">Adult ${index}</span>
+                <select class="form-control form-control-sm mr-1 required" name="adult_ages[]">${ops}</select>
+                <select class="form-control form-control-sm required" name="adult_genders[]">
+                    <option value="" disabled selected>Gender</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                </select>`;
             container.appendChild(div);
         }
 
         function removeAdultAgeSelect() {
             const c = document.getElementById('adultAgesContainer');
-            if (c.lastChild) c.removeChild(c.lastChild);
+            if (c.lastChild && c.children.length > 1) c.removeChild(c.lastChild);
         }
 
         function addSeniorAgeSelect(index) {
             const container = document.getElementById('seniorAgesContainer');
             const div = document.createElement('div');
             div.className = 'd-flex justify-content-between align-items-center mb-2 small gap-2';
-            let ops = '';
+            let ops = '<option value="" disabled selected>Age</option>';
             for (let i = 60; i <= 100; i++) ops += `<option value="${i}">${i} yrs</option>`;
 
             div.innerHTML = `
-        <span class="mr-2 text-nowrap">Senior ${index}</span>
-        <select class="form-control form-control-sm mr-1" name="senior_ages[]">${ops}</select>
-        <select class="form-control form-control-sm" name="senior_genders[]">
-            <option value="Male">Male</option>
-            <option value="Female">Female</option>
-        </select>`;
+                <span class="mr-2 text-nowrap font-weight-bold">Senior ${index}</span>
+                <select class="form-control form-control-sm mr-1 required" name="senior_ages[]">${ops}</select>
+                <select class="form-control form-control-sm required" name="senior_genders[]">
+                    <option value="" disabled selected>Gender</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                </select>`;
             container.appendChild(div);
         }
 
         function removeSeniorAgeSelect() {
             const c = document.getElementById('seniorAgesContainer');
-            if (c.lastChild) c.removeChild(c.lastChild);
+            if (c.lastChild && c.children.length > 1) c.removeChild(c.lastChild);
         }
 
-        // maintain age selectors counts
+        // Maintain age selectors counts and ensure they start at 1
         function syncAgeSelectors() {
             const aC = document.getElementById('adultAgesContainer');
             const cC = document.getElementById('childAgesContainer');
             const sC = document.getElementById('seniorAgesContainer');
 
-            while (aC.children.length < adults) addAdultAgeSelect(aC.children.length + 1);
-            while (aC.children.length > adults) removeAdultAgeSelect();
+            // Generate Adult 1 and upwards
+            while (aC.children.length - 1 < adults) addAdultAgeSelect(aC.children.length);
+            while (aC.children.length - 1 > adults) removeAdultAgeSelect();
             aC.classList.toggle('d-none', adults === 0);
 
-            while (cC.children.length < children) addChildAgeSelect(cC.children.length + 1);
-            while (cC.children.length > children) removeChildAgeSelect();
+            // Generate Child 1 and upwards
+            while (cC.children.length - 1 < children) addChildAgeSelect(cC.children.length);
+            while (cC.children.length - 1 > children) removeChildAgeSelect();
             cC.classList.toggle('d-none', children === 0);
 
-            while (sC.children.length < seniors) addSeniorAgeSelect(sC.children.length + 1);
-            while (sC.children.length > seniors) removeSeniorAgeSelect();
+            // Generate Senior 1 and upwards
+            while (sC.children.length - 1 < seniors) addSeniorAgeSelect(sC.children.length);
+            while (sC.children.length - 1 > seniors) removeSeniorAgeSelect();
             sC.classList.toggle('d-none', seniors === 0);
         }
 
         // 2. COST LOGIC
         const roomPrice = <?= $room['price'] ?>;
         const discountPercent = <?= $active_discount ?>;
-        const entranceRate = <?= $entrance_rate ?>; // Galing sa PHP
+        const entranceRate = <?= $entrance_rate ?>;
 
         function calculateRoomCost() {
             let d1 = document.getElementById("checkin").value;
@@ -860,9 +816,7 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0; // Default to 0 if walan
                     let total = diff * roomPrice;
                     if (discountPercent > 0) total -= (total * (discountPercent / 100));
 
-                    document.getElementById("room_cost").value = "₱" + total.toLocaleString(undefined, {
-                        minimumFractionDigits: 2
-                    });
+                    document.getElementById("room_cost").value = "₱" + total.toLocaleString(undefined, { minimumFractionDigits: 2 });
                     document.getElementById("room_cost_value").value = total.toFixed(2);
 
                     if (typeof calculateSummary === "function") calculateSummary();
@@ -899,13 +853,12 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0; // Default to 0 if walan
             });
             document.getElementById("prevBtn").disabled = n === 0;
             document.getElementById("nextBtn").textContent = n === formSteps.length - 1 ? "Confirm" : "Next";
-            if (n === 4) calculateSummary(); // Recalculate summary every time we land on the payment step
+            if (n === 4) calculateSummary();
             document.getElementById("nextBtn").classList.toggle("d-none", n === formSteps.length - 1);
             document.getElementById("prevBtn").classList.toggle("d-none", n === formSteps.length - 1);
         }
 
         document.getElementById("nextBtn").addEventListener("click", () => {
-            // Basic validation
             const inputs = formSteps[currentStep].querySelectorAll(".required");
             let valid = true;
             inputs.forEach(i => {
@@ -915,7 +868,6 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0; // Default to 0 if walan
                 } else i.classList.remove("is-invalid");
             });
 
-            // Additional validation for Step 1 (Dates and Guests)
             if (currentStep === 0) {
                 if (!document.getElementById("checkin").value || !document.getElementById("checkout").value) {
                     document.getElementById("date_range").classList.add("is-invalid");
@@ -929,6 +881,8 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0; // Default to 0 if walan
             if (valid && currentStep < formSteps.length - 1) {
                 currentStep++;
                 showStep(currentStep);
+            } else if (!valid) {
+                Swal.fire('Error', 'Please fill in all required fields (including Guest Ages and Genders).', 'error');
             }
         });
 
@@ -939,23 +893,18 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0; // Default to 0 if walan
             }
         });
 
-        showStep(0); // Initialize first step
+        showStep(0);
 
         function calculateSummary() {
             let room = parseFloat(document.getElementById("room_cost_value").value) || 0;
 
-            // CALCULATION NG ENTRANCE FEE (Everyone pays)
             let totalGuestsCount = adults + children + seniors;
             let totalEntrance = totalGuestsCount * entranceRate;
 
-            // I-update ang Display ng Entrance Fee
             document.getElementById("guest_summary_count").textContent = totalGuestsCount;
-            document.getElementById("entrance_payment").textContent = "₱" + totalEntrance.toLocaleString(undefined, {
-                minimumFractionDigits: 2
-            });
-            document.getElementById("total_entrance_fee_value").value = totalEntrance; // Para sa form submit
+            document.getElementById("entrance_payment").textContent = "₱" + totalEntrance.toLocaleString(undefined, { minimumFractionDigits: 2 });
+            document.getElementById("total_entrance_fee_value").value = totalEntrance;
 
-            // Iba pang calculations (Existing)
             let serv = 0;
             document.querySelectorAll(".service-check:checked").forEach(c => serv += parseFloat(c.dataset.price));
 
@@ -975,15 +924,11 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0; // Default to 0 if walan
                 let add = c.closest('tr').querySelector('.include-island').checked ? parseFloat(c.dataset.island) : 0;
                 boat += p + add;
             });
-            document.getElementById("totalAmount").textContent = boat.toLocaleString(undefined, {
-                minimumFractionDigits: 2
-            });
+            document.getElementById("totalAmount").textContent = boat.toLocaleString(undefined, { minimumFractionDigits: 2 });
 
-            // UPDATE SUMMARY PANELS (No events in admin, but include for consistency)
             let eventsHtml = '<p class="mb-0 text-muted">N/A (Admin)</p>';
             document.getElementById('summary_events').innerHTML = eventsHtml;
 
-            // Boat Summary
             let boatSummaryHtml = '';
             let boatChecked = document.querySelector('.boat-check:checked');
             if (boatChecked) {
@@ -1008,7 +953,6 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0; // Default to 0 if walan
             }
             document.getElementById('summary_boat').innerHTML = boatSummaryHtml;
 
-            // Services Summary
             let selectedServices = document.querySelectorAll('.service-check:checked');
             let servicesHtml = '';
             if (selectedServices.length > 0) {
@@ -1024,7 +968,6 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0; // Default to 0 if walan
             }
             document.getElementById('summary_services').innerHTML = servicesHtml;
 
-            // Rentals Summary
             let selectedRentals = document.querySelectorAll('.rental-check:checked');
             let rentalsHtml = '';
             if (selectedRentals.length > 0) {
@@ -1046,60 +989,36 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0; // Default to 0 if walan
             }
             document.getElementById('summary_rentals').innerHTML = rentalsHtml;
 
-            // STEP 5 DISPLAY UPDATES
-            document.getElementById("room_payment").textContent = "₱" + room.toLocaleString(undefined, {
-                minimumFractionDigits: 2
-            });
-            document.getElementById("services_payment").textContent = "₱" + serv.toLocaleString(undefined, {
-                minimumFractionDigits: 2
-            });
-            document.getElementById("rentals_payment").textContent = "₱" + rent.toLocaleString(undefined, {
-                minimumFractionDigits: 2
-            });
-            document.getElementById("boat_rentals_payment").textContent = "₱" + boat.toLocaleString(undefined, {
-                minimumFractionDigits: 2
-            });
+            document.getElementById("room_payment").textContent = "₱" + room.toLocaleString(undefined, { minimumFractionDigits: 2 });
+            document.getElementById("services_payment").textContent = "₱" + serv.toLocaleString(undefined, { minimumFractionDigits: 2 });
+            document.getElementById("rentals_payment").textContent = "₱" + rent.toLocaleString(undefined, { minimumFractionDigits: 2 });
+            document.getElementById("boat_rentals_payment").textContent = "₱" + boat.toLocaleString(undefined, { minimumFractionDigits: 2 });
 
-            // TOTAL CALCULATION (Isinama na ang totalEntrance)
             let total = room + serv + rent + boat + totalEntrance;
 
-            // Set grand total value
-            document.getElementById("total_payment").value = "₱" + total.toLocaleString(undefined, {
-                minimumFractionDigits: 2
-            });
+            document.getElementById("total_payment").value = "₱" + total.toLocaleString(undefined, { minimumFractionDigits: 2 });
             document.getElementById("total_payments_value").value = total.toFixed(2);
 
-            // Payment Option Logic (Downpayment)
             const opt = document.getElementById("payment_option").value;
             let pay = total;
             if (opt === 'downpayment') pay = total * 0.5;
 
-            document.getElementById("amount_to_pay_display").value = "₱" + pay.toLocaleString(undefined, {
-                minimumFractionDigits: 2
-            });
+            document.getElementById("amount_to_pay_display").value = "₱" + pay.toLocaleString(undefined, { minimumFractionDigits: 2 });
             document.getElementById("final_payable").value = pay.toFixed(2);
         }
 
-        // Listeners
-        // Generic recalculation when checkboxes change
         document.querySelectorAll("input[type=checkbox]").forEach(c => c.addEventListener('change', calculateSummary));
         document.getElementById("payment_option").addEventListener("change", calculateSummary);
 
-        // Boat selection: single-choice behavior and island-hop visibility
         document.querySelectorAll('.boat-check').forEach(cb => {
             cb.addEventListener('change', function () {
                 if (this.checked) {
-                    // disable other boats
                     document.querySelectorAll('.boat-check').forEach(o => { if (o !== this) o.disabled = true; });
-
-                    // show island hop for this row
                     const inc = this.closest('tr').querySelector('.include-island');
                     if (inc) {
                         inc.style.display = 'inline-block';
                         inc.disabled = false;
                     }
-
-                    // hide island hop for other rows
                     document.querySelectorAll('.include-island').forEach(ii => {
                         if (ii !== inc) {
                             ii.style.display = 'none';
@@ -1108,7 +1027,6 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0; // Default to 0 if walan
                         }
                     });
                 } else {
-                    // allow selecting again
                     document.querySelectorAll('.boat-check').forEach(o => o.disabled = false);
                     document.querySelectorAll('.include-island').forEach(ii => {
                         ii.style.display = 'none';
@@ -1120,10 +1038,8 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0; // Default to 0 if walan
             });
         });
 
-        // island hop toggles affect totals
         document.querySelectorAll('.include-island').forEach(ii => ii.addEventListener('change', calculateSummary));
 
-        // Service details toggles
         document.querySelectorAll('.service-detail-toggle').forEach(btn => {
             btn.addEventListener('click', function (e) {
                 e.preventDefault();
@@ -1134,7 +1050,6 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0; // Default to 0 if walan
             });
         });
 
-        // Rental selection: show duration select when rental is checked
         document.querySelectorAll('.rental-check').forEach(cb => {
             cb.addEventListener('change', function () {
                 const card = this.closest('.card');
@@ -1158,20 +1073,15 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0; // Default to 0 if walan
             });
         });
 
-        // Recalculate when rental duration changes
         document.querySelectorAll('.rental-duration-select').forEach(s => s.addEventListener('change', calculateSummary));
-
-        // Initialize rental-duration selects as disabled/hidden
         document.querySelectorAll('.rental-duration').forEach(div => {
             const sel = div.querySelector('.rental-duration-select');
             if (sel) sel.disabled = true;
             div.classList.add('d-none');
         });
 
-        // Ensure initial calculation runs
         calculateRoomCost();
 
-        // Confirm Walk-in
         document.getElementById("confirmBookingBtn").addEventListener("click", function () {
             if (!document.getElementById("payment_type").value) {
                 document.getElementById("payment_type").classList.add("is-invalid");
@@ -1190,22 +1100,12 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0; // Default to 0 if walan
                     let form = document.getElementById("multiStepForm");
                     let formData = new FormData(form);
 
-                    // GENDER AGGREGATION
+                    // --- GENDER AGGREGATION FIXED ---
                     let maleCount = 0;
                     let femaleCount = 0;
 
-                    // 1. Primary Guest
-                    const primaryGender = document.querySelector('input[name="gender"]:checked').value;
-                    if (primaryGender === "Male") maleCount++; else if (primaryGender === "Female") femaleCount++;
-
-                    // 2. Aggregate Adult Genders (Starting from index 1)
-                    document.querySelectorAll('select[name="adult_genders[]"]').forEach((sel, idx) => {
-                        if (idx === 0) return; // Skip primary
-                        if (sel.value === "Male") maleCount++; else if (sel.value === "Female") femaleCount++;
-                    });
-
-                    // 3. Aggregate Child and Senior Genders
-                    ['child_genders[]', 'senior_genders[]'].forEach(name => {
+                    // 1. Aggregate ALL Genders (Adults, Children, Seniors)
+                    ['adult_genders[]', 'child_genders[]', 'senior_genders[]'].forEach(name => {
                         document.querySelectorAll(`select[name="${name}"]`).forEach(sel => {
                             if (sel.value === "Male") maleCount++; else if (sel.value === "Female") femaleCount++;
                         });

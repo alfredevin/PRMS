@@ -955,8 +955,8 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0;
 
             div.innerHTML = `
         <span class="small fw-bold">Child ${index}</span>
-        <select class="form-select form-select-sm w-auto required" name="child_ages[]">${ageOps}</select>
-        <select class="form-select form-select-sm w-auto required" name="child_genders[]">
+        <select class="form-control form-control-sm w-auto required" name="child_ages[]">${ageOps}</select>
+        <select class="form-control form-control-sm w-auto required" name="child_genders[]">
             <option value="" disabled selected>Gender</option>
             <option value="Male">Male</option><option value="Female">Female</option>
         </select>`;
@@ -981,8 +981,8 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0;
 
             div.innerHTML = `
         <span class="small fw-bold">Adult ${index}</span>
-        <select class="form-select form-select-sm w-auto required" name="adult_ages[]">${ageOps}</select>
-        <select class="form-select form-select-sm w-auto required" name="adult_genders[]">
+        <select class="form-control form-control-sm w-auto required" name="adult_ages[]">${ageOps}</select>
+        <select class="form-control form-control-sm w-auto required" name="adult_genders[]">
             <option value="" disabled selected>Gender</option>
             <option value="Male">Male</option><option value="Female">Female</option>
         </select>`;
@@ -1007,8 +1007,8 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0;
 
             div.innerHTML = `
         <span class="small fw-bold">Senior ${index}</span>
-        <select class="form-select form-select-sm w-auto required" name="senior_ages[]">${ageOps}</select>
-        <select class="form-select form-select-sm w-auto required" name="senior_genders[]">
+        <select class="form-control form-control-sm w-auto required" name="senior_ages[]">${ageOps}</select>
+        <select class="form-control form-control-sm w-auto required" name="senior_genders[]">
             <option value="" disabled selected>Gender</option>
             <option value="Male">Male</option><option value="Female">Female</option>
         </select>`;
