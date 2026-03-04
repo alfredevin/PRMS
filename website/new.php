@@ -391,7 +391,7 @@ $entrance_rate = $fee_data['entrance_fee_amount'] ?? 0;
                                                 <div id="seniorAgesContainer" class="border-top pt-3 mt-2 d-none"><small
                                                         class="text-muted d-block mb-2 fw-bold">Senior Details:</small>
                                                 </div>
-
+                                                 
                                                 <input type="hidden" name="adults" id="inputAdults" value="1">
                                                 <input type="hidden" name="children" id="inputChildren" value="0">
                                                 <input type="hidden" name="seniors" id="inputSeniors" value="0">

@@ -10,6 +10,7 @@ $sql = "
         r.room_name, 
         r.image,
         r.quantity,
+        r.available,
         rtb.room_type_name,
         (SELECT COUNT(*) FROM reservation_tbl res WHERE res.room_id = r.room_id AND res.status = 2) as reserved_count,
         (SELECT COUNT(*) FROM reservation_tbl res WHERE res.room_id = r.room_id AND res.status = 3) as stayin_count,
@@ -33,7 +34,7 @@ $rooms_data = [];
 while ($row = mysqli_fetch_assoc($result)) {
     $reserved = $row['reserved_count'];
     $stayin = $row['stayin_count'];
-    $available = $row['quantity'] - ($reserved + $stayin);
+    $available = $row['available'] - ($reserved + $stayin);
 
     // Aggregate totals
     $totalAvailable += max(0, $available); // Prevent negative
